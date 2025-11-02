@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dr.Buho 스타일 블로그 – 정갈한 여백 & 애플 감성</title>
+<style>
+  /* =========================
+     Design Tokens (8pt scale)
+  ========================== */
+  :root{
+    /* Spacing */
+    --space-1:4px;  --space0:8px;  --space1:12px; --space2:16px; --space3:20px;
+    --space4:24px; --space5:32px; --space6:40px; --space7:48px; --space8:64px;
+    /* Colors */
+    --bg:#fff; --card:#fff; --line:#e5e5ea; --ink:#1d1d1f; --ink-2:#424245; --ink-3:#6e6e73;
+    --accent:#0071e3; --chip:#f5f5f7; --chip-line:#e7e7ea; --shadow:0 6px 18px rgba(0,0,0,.06);
+    /* Layout */
+    --radius:18px; --radius-sm:12px; --max:1060px;
+    /* Motion */
+    --ease: cubic-bezier(.22,.61,.36,1);
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Pretendard,
+         "Apple SD Gothic Neo","Noto Sans KR",Arial,sans-serif;
+    -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+    -webkit-tap-highlight-color:transparent;
+  }
+  img{display:block;max-width:100%;height:auto}
+  a{color:inherit;text-decoration:none}
+  .container{max-width:var(--max);margin:0 auto;padding:var(--space6) var(--space4)}
+
+  /* =========================
+     Header / Global Nav (clean)
+  ========================== */
+  .site-header{
+    position:sticky;top:0;z-index:50;background:#fff;
+    border-bottom:1px solid var(--line);backdrop-filter:saturate(180%) blur(8px)
+  }
+  .site-header .inner{
+    max-width:var(--max);margin:0 auto;padding:14px var(--space4);
+    display:flex;align-items:center;gap:var(--space4)
+  }
+  .brand{display:flex;align-items:center;gap:10px;margin-right:auto}
+  .brand .logo{width:32px;height:32px;border-radius:50%;background:#111827;
+    display:grid;place-items:center;color:#fff;font-weight:800;font-size:14px}
+  .brand .name{font-weight:800;font-size:20px;letter-spacing:-.01em}
+
+  .nav{display:none;align-items:center;gap:28px}
+  .nav a,.nav button{
+    font-weight:600;color:var(--ink-2);letter-spacing:.005em
+  }
+  .nav button{
+    background:transparent;border:0;padding:0;cursor:pointer
+  }
+  .nav .caret{
+    font-size:16px;line-height:1;margin-left:6px;transition:transform .18s var(--ease)
+  }
+  .dropdown[aria-expanded="true"] .caret{transform:rotate(180deg)}
+
+  /* Dropdown (bubble) */
+  .dropdown{position:relative}
+  .dropdown-panel{
+    position:absolute;top:calc(100% + 14px);left:50%;
+    transform:translateX(-50%) translateY(8px);opacity:0;visibility:hidden;
+    transition:.18s var(--ease);min-width:260px;background:#fff;border:1px solid var(--line);
+    border-radius:16px;box-shadow:0 18px 36px rgba(0,0,0,.14);padding:10px
+  }
+  .dropdown-panel::before{
+    content:"";position:absolute;top:-8px;left:50%;transform:translateX(-50%);
+    border:8px solid transparent;border-bottom-color:#fff;
+    filter:drop-shadow(0 -1px 0 var(--line))
+  }
+  .dropdown[aria-expanded="true"] .dropdown-panel{
+    opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)
+  }
+  .menu-item{display:flex;align-items:center;gap:12px;padding:10px;border-radius:12px}
+  .menu-item:hover{background:#f5f5f7}
+  .menu-item .app{width:28px;height:28px;border-radius:8px;
+    display:grid;place-items:center;color:#fff;font-weight:800}
+  .app.cleaner{background:#0a84ff}.app.unlocker{background:#30b0c7}
+  .app.repair{background:#5ac8f5}.app.ntfs{background:#111827}
+
+  /* Mobile trigger / drawer */
+  .mobile-toggle{margin-left:auto;width:34px;height:24px;position:relative;border:0;background:transparent}
+  .mobile-toggle span,.mobile-toggle::before,.mobile-toggle::after{
+    content:"";position:absolute;left:0;right:0;height:2px;background:#8e8e93;border-radius:2px}
+  .mobile-toggle span{top:11px}.mobile-toggle::before{top:0}.mobile-toggle::after{bottom:0}
+  .drawer{position:fixed;inset:0;z-index:60;display:none}
+  .drawer.active{display:block}
+  .drawer .backdrop{position:absolute;inset:0;background:rgba(0,0,0,.25)}
+  .drawer .panel{
+    position:absolute;right:0;top:0;bottom:0;width:min(88vw,420px);
+    background:#fff;display:flex;flex-direction:column
+  }
+  .drawer .panel header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px var(--space4);border-bottom:1px solid var(--line)
+  }
+  .drawer .close{width:28px;height:28px;border:0;background:transparent;color:#6e6e73;font-size:22px}
+  .drawer nav{padding:var(--space1) var(--space1) var(--space6)}
+  .drawer a,.drawer summary{
+    display:flex;align-items:center;gap:10px;padding:12px var(--space3);
+    border-radius:12px;color:var(--ink);font-weight:600
+  }
+  .drawer details{border-bottom:1px solid #eee}
+  .drawer .submenu a{padding:10px calc(var(--space3) + 10px);color:#424245;font-weight:500}
+
+  @media (min-width:1024px){.nav{display:flex}.mobile-toggle{display:none}}
+
+  /* =========================
+     Section Titles
+  ========================== */
+  .section-title{
+    font-size:clamp(24px,3vw,32px);font-weight:800;letter-spacing:-.015em;
+    margin:0 0 var(--space4)
+  }
+
+  /* =========================
+     Featured Article (refined)
+  ========================== */
+  .featured{
+    display:grid;background:var(--card);border:1px solid var(--line);
+    border-radius:var(--radius);overflow:hidden;
+    transition:box-shadow .2s var(--ease), transform .2s var(--ease)
+  }
+  .featured .thumb{overflow:hidden}
+  .featured .thumb img{
+    width:100%;height:clamp(180px,30vw,280px);object-fit:cover;
+    transition:transform .28s var(--ease)
+  }
+  .featured .content{padding:var(--space5)}
+  .kicker{font-size:13px;color:var(--ink-3)}
+  .featured h3{
+    font-size:clamp(20px,2.2vw,26px);line-height:1.45;
+    margin:6px 0 var(--space1);font-weight:800;letter-spacing:-.01em
+  }
+  .featured p{font-size:15px;color:var(--ink-2);margin:0 0 var(--space3)}
+  .meta{display:flex;align-items:center;gap:10px;color:var(--ink-3);font-size:13px}
+  .avatar{width:24px;height:24px;border-radius:50%;background:#e5e5ea}
+
+  @media (hover:hover){
+    .featured:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+    .featured:hover .thumb img{transform:scale(1.02)}
+  }
+
+  @media (min-width:1024px){
+    .featured{grid-template-columns:1.05fr .95fr}
+    .featured .thumb img{height:clamp(220px,24vw,320px)}
+  }
+
+  /* =========================
+     Cards Grid (consistent)
+  ========================== */
+  .grid{display:grid;gap:var(--space4);grid-template-columns:1fr;margin-top:var(--space5)}
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius-sm);
+    overflow:hidden;transition:box-shadow .2s var(--ease), transform .2s var(--ease)
+  }
+  .card .thumb{aspect-ratio:16/10;overflow:hidden}
+  .card .thumb > *{width:100%;height:100%;transition:transform .28s var(--ease)}
+  .card .body{padding:var(--space3) var(--space3) var(--space2)}
+  .card h4{font-size:17px;line-height:1.45;margin:0 0 var(--space1);font-weight:700;letter-spacing:-.01em}
+  .card .excerpt{font-size:14px;color:var(--ink-2);margin:0 0 var(--space2)}
+  .card .meta{padding:0 var(--space3) var(--space3)}
+  @media (hover:hover){
+    .card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+    .card:hover .thumb > *{transform:scale(1.02)}
+  }
+
+  /* =========================
+     How-to Section
+  ========================== */
+  .chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:var(--space5) 0 var(--space3)}
+  .chip{
+    display:inline-flex;align-items:center;gap:6px;background:var(--chip);
+    border:1px solid var(--chip-line);color:#0a84ff;border-radius:999px;
+    padding:6px 12px;font-size:12.5px
+  }
+  .chip .dot{width:6px;height:6px;border-radius:50%;background:#ff9f0a}
+  .more{margin-left:auto;font-size:14px;color:#6e6e73}
+  .how-grid{display:grid;gap:var(--space4);grid-template-columns:1fr}
+  .how-card{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius-sm);
+    overflow:hidden;transition:box-shadow .2s var(--ease), transform .2s var(--ease)
+  }
+  .how-card .thumb{aspect-ratio:16/10;border-bottom:1px solid var(--line)}
+  .how-card .body{padding:var(--space3)}
+  .how-card h5{font-size:16px;line-height:1.5;margin:0 0 var(--space1);font-weight:700}
+  @media (hover:hover){ .how-card:hover{transform:translateY(-2px);box-shadow:var(--shadow)} }
+  .thumb.grad-1{background:linear-gradient(135deg,#c7d2fe,#e9d5ff)}
+  .thumb.grad-2{background:linear-gradient(135deg,#ffe0b2,#ffd6e7)}
+  .thumb.grad-3{background:linear-gradient(135deg,#c5f7e5,#d1e9ff)}
+  .thumb.grad-4{background:linear-gradient(135deg,#e0f2fe,#ccfbf1)}
+  .thumb.grad-5{background:linear-gradient(135deg,#fde68a,#fca5a5)}
+  .thumb.grad-6{background:linear-gradient(135deg,#e9d5ff,#fecaca)}
+
+  /* =========================
+     Footer (site-matched)
+  ========================== */
+  .footer{background:#0b0b0c;color:#e5e7eb;margin-top:var(--space7)}
+  .footer .container{max-width:var(--max);margin:0 auto;padding:var(--space6) var(--space4)}
+  .foot-head{display:flex;flex-direction:column;align-items:center;gap:12px;margin-bottom:var(--space2)}
+  .foot-head .logo{width:48px;height:48px;border-radius:50%;background:#fff;color:#111827;display:grid;place-items:center;font-weight:900}
+  .foot-desc{color:#9ca3af;font-size:13.5px;text-align:center}
+  .foot-accord details{border-top:1px solid #1f2937}
+  .foot-accord summary{
+    list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;
+    padding:14px 0;font-size:14px;font-weight:700;color:#e5e7eb
+  }
+  .foot-accord summary::-webkit-details-marker{display:none}
+  .foot-accord .list a{display:block;color:#cbd5e1;padding:8px 0;font-size:13.5px}
+  .foot-accord .list a:hover{color:#fff}
+  .langs{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:16px 0 10px}
+  .langs a{color:#cbd5e1;font-size:13px}
+  .langs a:hover{color:#fff}
+  .social{display:flex;gap:10px;justify-content:center;margin:10px 0}
+  .social a{width:28px;height:28px;border:1px solid #1f2937;border-radius:50%;display:grid;place-items:center;color:#cbd5e1}
+  .foot-meta{border-top:1px solid #1f2937;margin-top:14px;padding-top:14px;color:#9ca3af;font-size:12.5px;text-align:center}
+  .foot-grid{display:none}
+
+  /* =========================
+     Breakpoints
+  ========================== */
+  @media (min-width:768px){
+    .grid{grid-template-columns:repeat(2,1fr)}
+    .how-grid{grid-template-columns:repeat(2,1fr)}
+  }
+  @media (min-width:1024px){
+    .grid{grid-template-columns:repeat(3,1fr)}
+    .how-grid{grid-template-columns:repeat(3,1fr)}
+    .foot-accord{display:none}
+    .foot-head{flex-direction:row;justify-content:space-between;margin-bottom:var(--space4)}
+    .foot-head .foot-desc{text-align:left}
+    .foot-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:28px;margin:22px 0}
+    .foot-col h6{margin:0 0 10px;font-size:13px;color:#94a3b8;font-weight:700}
+    .foot-col a{display:block;font-size:13.5px;color:#e5e7eb;padding:6px 0}
+    .foot-col a:hover{color:#fff}
+  }
+
+  /* Accessibility & Motion */
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:8px}
+  @media (prefers-reduced-motion:reduce){
+    .featured,.card,.how-card,.featured .thumb img,.card .thumb > *{transition:none}
+  }
+
+  /* 제목 색 전환 애니메이션 */
+.featured h3,
+.card h4,
+.how-card h5 { transition: color .18s var(--ease); }
+
+/* 카드/기사에 호버 시 제목을 파란색으로 */
+@media (hover:hover){
+  .featured:hover h3,
+  .card:hover h4,
+  .how-card:hover h5 { color: var(--accent); }
+
+  /* 제목 텍스트만 호버해도 반응하도록(선택 사항) */
+  .featured h3:hover,
+  .card h4:hover,
+  .how-card h5:hover { color: var(--accent); }
+}
+
+
+@media (hover:hover){
+  .featured:hover,
+  .card h4:hover,
+  .how-card h5:hover,
+  .featured .thumb:hover,
+  .card:hover,
+  .how-card .thumb:hover { cursor: pointer; }
+}
+
+
+
+</style>
+</head>
+<body>
+  <!-- ===== Header ===== -->
+  <header class="site-header">
+    <div class="inner">
+      <a href="#" class="brand"><div class="logo">B</div><div class="name">Dr.Buho</div></a>
+      <nav class="nav" aria-label="Primary">
+        <a href="#">홈</a>
+        <div class="dropdown" aria-expanded="false">
+          <button type="button" aria-haspopup="true" aria-expanded="false">제품 <span class="caret">▾</span></button>
+          <div class="dropdown-panel" role="menu">
+            <a class="menu-item" href="#"><span class="app cleaner">C</span> BuhoCleaner</a>
+            <a class="menu-item" href="#"><span class="app unlocker">U</span> BuhoUnlocker</a>
+            <a class="menu-item" href="#"><span class="app repair">R</span> BuhoRepair</a>
+            <a class="menu-item" href="#"><span class="app ntfs">N</span> BuhoNTFS</a>
+          </div>
+        </div>
+        <a href="#">🛒 스토어</a>
+        <a href="#">블로그</a>
+        <div class="dropdown" aria-expanded="false">
+          <button type="button" aria-haspopup="true" aria-expanded="false">회사 <span class="caret">▾</span></button>
+          <div class="dropdown-panel" role="menu">
+            <a class="menu-item" href="#">소개</a>
+            <a class="menu-item" href="#">지원</a>
+            <a class="menu-item" href="#">프라이버시</a>
+            <a class="menu-item" href="#">조항</a>
+            <a class="menu-item" href="#">환불</a>
+          </div>
+        </div>
+      </nav>
+      <button class="mobile-toggle" id="openDrawer" aria-label="메뉴 열기" aria-expanded="false"><span></span></button>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer -->
+  <div class="drawer" id="drawer" aria-hidden="true">
+    <div class="backdrop" id="closeDrawer"></div>
+    <aside class="panel" role="dialog" aria-modal="true">
+      <header>
+        <div class="brand"><div class="logo">B</div><div class="name">Dr.Buho</div></div>
+        <button class="close" id="xClose" aria-label="닫기">✕</button>
+      </header>
+      <nav>
+        <a href="#">홈</a>
+        <details open>
+          <summary>제품</summary>
+          <div class="submenu">
+            <a href="#">BuhoCleaner</a>
+            <a href="#">BuhoUnlocker</a>
+            <a href="#">BuhoRepair</a>
+            <a href="#">BuhoNTFS</a>
+          </div>
+        </details>
+        <a href="#">🛒 스토어</a>
+        <a href="#">블로그</a>
+        <details>
+          <summary>회사</summary>
+          <div class="submenu">
+            <a href="#">소개</a>
+            <a href="#">지원</a>
+            <a href="#">프라이버시</a>
+            <a href="#">조항</a>
+            <a href="#">환불</a>
+          </div>
+        </details>
+      </nav>
+    </aside>
+  </div>
+
+  <main class="container">
+    <!-- ===== Featured ===== -->
+    <h2 class="section-title">인기 글</h2>
+    <section class="featured" aria-label="featured post">
+      <div class="thumb">
+        <img src="https://images.unsplash.com/photo-1551033406-611cf9a28f67?q=80&w=1200&auto=format&fit=crop" alt="앱 아이콘 일러스트"/>
+      </div>
+      <div class="content">
+        <div class="kicker">가이드</div>
+        <h3>MacBook에서 프로그램을 완전히 삭제하는 5가지 방법</h3>
+        <p>삭제 후에도 남는 잔여 파일을 깔끔하게 제거하는 5가지 방법을 정리했습니다. 초보자도 쉽게 따라할 수 있어요.</p>
+        <div class="meta"><span class="avatar" aria-hidden="true"></span><span>지호 · 최종 업데이트 2025년 5월</span></div>
+      </div>
+    </section>
+
+    <!-- ===== Cards ===== -->
+    <div class="grid" aria-label="popular cards">
+      <article class="card">
+        <div class="thumb"><div style="width:100%;height:100%;background:linear-gradient(135deg,#c7d2fe,#fde68a)"></div></div>
+        <div class="body">
+          <h4>Mac에서 시스템 데이터 삭제하는 10가지 방법</h4>
+          <p class="excerpt">빠르게 용량을 회복하고 안정성을 유지하는 실전 팁을 정리했습니다.</p>
+        </div>
+        <div class="meta"><span class="avatar"></span><span>지안 · 2025년 4월 9일</span></div>
+      </article>
+      <article class="card">
+        <div class="thumb"><div style="width:100%;height:100%;background:linear-gradient(135deg,#bae6fd,#a7f3d0)"></div></div>
+        <div class="body">
+          <h4>Mac 시작 시 자동 실행 앱 끄는 5가지 방법 [2025]</h4>
+          <p class="excerpt">로그인 아이템과 에이전트 관리로 부팅 속도를 끌어올리세요.</p>
+        </div>
+        <div class="meta"><span class="avatar"></span><span>지호 · 2025년 5월 8일</span></div>
+      </article>
+      <article class="card">
+        <div class="thumb"><div style="width:100%;height:100%;background:linear-gradient(135deg,#fde68a,#fca5a5)"></div></div>
+        <div class="body">
+          <h4>[2025] 아이폰 비밀번호가 계속 틀릴 때 간편 해결법</h4>
+          <p class="excerpt">잠금 해제 오류가 반복될 때 즉시 해볼 수 있는 해결책 모음.</p>
+        </div>
+        <div class="meta"><span class="avatar"></span><span>지안 · 2025년 1월 18일</span></div>
+      </article>
+    </div>
+
+    <!-- ===== How-to ===== -->
+    <div class="chips">
+      <span class="chip"><span class="dot"></span> iOS 18 익히기</span>
+      <span class="chip" style="color:#0a84ff">macOS Sequoia 정보 🔥</span>
+      <a class="more" href="#">더 알아보기 ▸</a>
+    </div>
+    <section class="how-grid" aria-label="how-to cards">
+      <article class="how-card"><div class="thumb grad-1"></div><div class="body"><h5>[고정] Mac에서 WindowServer 높은 CPU 점유 해결</h5><div class="meta"><span class="avatar"></span><span>지안 · 2025년 5월 1일</span></div></div></article>
+      <article class="how-card"><div class="thumb grad-2"></div><div class="body"><h5>iOS 26 공간 정리: 3D 배경 제거, 메시지 캐시 삭제</h5><div class="meta"><span class="avatar"></span><span>지호 · 2025년 5월 14일</span></div></div></article>
+      <article class="how-card"><div class="thumb grad-3"></div><div class="body"><h5>[2025] 맥북 사용자라면 꼭 설치해야 할 무료앱 15선</h5><div class="meta"><span class="avatar"></span><span>처음 · 2025년 3월 8일</span></div></div></article>
+      <article class="how-card"><div class="thumb grad-4"></div><div class="body"><h5>DaisyDisk를 테스트해 보았습니다: 저장공간 효율화 가이드</h5><div class="meta"><span class="avatar"></span><span>처음 · 2025년 4월 12일</span></div></div></article>
+      <article class="how-card"><div class="thumb grad-5"></div><div class="body"><h5>Mac에서 Illustrator가 느려질 때 5가지 체크리스트</h5><div class="meta"><span class="avatar"></span><span>처음 · 2025년 3월 7일</span></div></div></article>
+      <article class="how-card"><div class="thumb grad-6"></div><div class="body"><h5>Mac에서 Spotify 캐시를 지우는 방법 [완전 가이드]</h5><div class="meta"><span class="avatar"></span><span>처음 · 2025년 6월 8일</span></div></div></article>
+    </section>
+  </main>
+
+  <!-- ===== Footer ===== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="foot-head">
+        <div class="logo">B</div>
+        <div class="foot-desc">간단하고 사용하기 쉬운 앱을 구축하여 Mac 및 iPhone 경험을 향상시킵니다.<br>40F Building 2, No. 530, Tianfu Avenue Middle, Hi-Tech Zone</div>
+      </div>
+      <nav class="foot-accord" aria-label="footer links">
+        <details>
+          <summary>인기 뉴스</summary>
+          <div class="list">
+            <a href="#">Mac에서 시스템 데이터 삭제</a>
+            <a href="#">Mac에서 앱 삭제</a>
+            <a href="#">iOS 18 에 대해</a>
+            <a href="#">macOS Sequoia 정보</a>
+          </div>
+        </details>
+        <details>
+          <summary>제품</summary>
+          <div class="list">
+            <a href="#">BuhoCleaner</a>
+            <a href="#">BuhoUnlocker</a>
+            <a href="#">BuhoRepair</a>
+            <a href="#">BuhoNTFS</a>
+          </div>
+        </details>
+        <details>
+          <summary>프라이버시</summary>
+          <div class="list">
+            <a href="#">조항</a>
+            <a href="#">프라이버시</a>
+            <a href="#">환불</a>
+          </div>
+        </details>
+        <details>
+          <summary>회사</summary>
+          <div class="list">
+            <a href="#">소개</a>
+            <a href="#">지원</a>
+            <a href="#">스토어</a>
+          </div>
+        </details>
+      </nav>
+      <div class="foot-grid">
+        <div class="foot-col"><h6>인기 뉴스</h6>
+          <a href="#">Mac에서 시스템 데이터 삭제</a>
+          <a href="#">Mac에서 앱 삭제</a>
+          <a href="#">iOS 18 에 대해</a>
+          <a href="#">macOS Sequoia 정보</a>
+        </div>
+        <div class="foot-col"><h6>제품</h6>
+          <a href="#">BuhoCleaner</a>
+          <a href="#">BuhoUnlocker</a>
+          <a href="#">BuhoRepair</a>
+          <a href="#">BuhoNTFS</a>
+        </div>
+        <div class="foot-col"><h6>프라이버시</h6>
+          <a href="#">조항</a>
+          <a href="#">프라이버시</a>
+          <a href="#">환불</a>
+        </div>
+        <div class="foot-col"><h6>회사</h6>
+          <a href="#">소개</a>
+          <a href="#">지원</a>
+          <a href="#">스토어</a>
+        </div>
+      </div>
+      <div class="langs" aria-label="languages">
+        <a href="#">한국어</a>·<a href="#">English</a>·<a href="#">繁體中文</a>·<a href="#">日本語</a>·<a href="#">Deutsch</a>·<a href="#">Français</a>·<a href="#">Español</a>·<a href="#">Italiano</a>·<a href="#">Português</a>·<a href="#">Nederlands</a>·<a href="#">Polski</a>
+      </div>
+      <div class="social" aria-label="follow us">
+        <a href="#" aria-label="X">𝕏</a>
+        <a href="#" aria-label="YouTube">▶</a>
+        <a href="#" aria-label="Instagram">◎</a>
+      </div>
+      <div class="foot-meta">Copyright © 2025 Dr.Buho Inc., All Rights Reserved.</div>
+    </div>
+  </footer>
+
+  <script>
+    // Desktop dropdown open/close (click); close when clicking outside or pressing ESC
+    document.querySelectorAll('.dropdown > button').forEach(btn=>{
+      btn.addEventListener('click',e=>{
+        const dd = e.currentTarget.parentElement;
+        const state = dd.getAttribute('aria-expanded') === 'true';
+        document.querySelectorAll('.dropdown').forEach(d=>d.setAttribute('aria-expanded','false'));
+        dd.setAttribute('aria-expanded', state ? 'false' : 'true');
+      });
+    });
+    document.addEventListener('click',e=>{
+      if(!e.target.closest('.dropdown')){
+        document.querySelectorAll('.dropdown').forEach(d=>d.setAttribute('aria-expanded','false'));
+      }
+    });
+    document.addEventListener('keydown',e=>{
+      if(e.key==='Escape'){
+        document.querySelectorAll('.dropdown').forEach(d=>d.setAttribute('aria-expanded','false'));
+        toggleDrawer(false);
+      }
+    });
+
+    // Mobile drawer
+    const drawer = document.getElementById('drawer');
+    const openBtn = document.getElementById('openDrawer');
+    const closeEls = [document.getElementById('closeDrawer'), document.getElementById('xClose')];
+    const toggleDrawer = (open)=>{
+      drawer.classList.toggle('active', open);
+      drawer.setAttribute('aria-hidden', open? 'false':'true');
+      openBtn.setAttribute('aria-expanded', open? 'true':'false');
+    };
+    openBtn.addEventListener('click',()=>toggleDrawer(true));
+    closeEls.forEach(el=>el && el.addEventListener('click',()=>toggleDrawer(false)));
+  </script>
+</body>
+</html>

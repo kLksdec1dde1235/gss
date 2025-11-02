@@ -1,0 +1,148 @@
+<section class="gds-comments" aria-labelledby="gds-comments-title">
+  <style>
+    /* ===== Scoped styles only (no global selectors) ===== */
+    .gds-comments{
+      --gds-bg:#ffffff; --gds-surface:#fafafa; --gds-line:#e9e9ec;
+      --gds-text:#222; --gds-muted:#6b7280;
+      --gds-accent-a:#dcbe4e; --gds-accent-b:#f8e18c;
+      --gds-shadow:0 6px 20px rgba(16,24,40,.06);
+      --gds-radius:14px; --gds-max:900px;
+      font-family:'Noto Sans KR',system-ui,-apple-system,Segoe UI,Roboto,'Apple SD Gothic Neo',sans-serif;
+      color:var(--gds-text); background:transparent; margin:0 auto;
+    }
+    .gds-comments .gds-wrap{max-width:var(--gds-max);margin:0 auto;padding:1rem 1rem 2rem;}
+    .gds-comments .gds-head{display:flex;align-items:center;gap:.75rem;margin-bottom:1rem;}
+    .gds-comments .gds-title{display:flex;align-items:center;gap:.6rem;font-weight:800;font-size:1.25rem;letter-spacing:-.02em;}
+    .gds-comments .gds-deco{width:60px;height:6px;border-radius:3px;background:linear-gradient(90deg,var(--gds-accent-a),var(--gds-accent-b));flex:0 0 auto;}
+
+    .gds-comments .gds-list{list-style:none;margin:0;padding:0;display:grid;gap:.9rem;}
+    .gds-comments .gds-card{
+      background:#fff;border:1px solid var(--gds-line);border-radius:var(--gds-radius);
+      box-shadow:var(--gds-shadow);padding:.9rem .95rem;
+      display:grid;grid-template-columns:48px 1fr;gap:.9rem;
+    }
+    .gds-comments .gds-avatar{width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.08);background:#ddd;}
+    .gds-comments .gds-name-row{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;}
+    .gds-comments .gds-name{font-weight:700;letter-spacing:-.02em;}
+    .gds-comments .gds-meta{font-size:.82rem;color:var(--gds-muted);}
+    .gds-comments .gds-body{margin-top:.35rem;font-size:.97rem;line-height:1.6;}
+    .gds-comments .gds-imgs{margin-top:.6rem;display:flex;gap:.45rem;flex-wrap:wrap;}
+    .gds-comments .gds-thumb{width:92px;height:68px;border-radius:10px;object-fit:cover;border:1px solid var(--gds-line);background:#f2f2f2;transition:transform .2s ease;}
+    .gds-comments .gds-thumb:hover{transform:translateY(-2px);}
+    .gds-comments .gds-foot{margin-top:.55rem;display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;font-size:.86rem;color:var(--gds-muted);}
+    .gds-comments .gds-like{display:inline-flex;align-items:center;gap:.35rem;}
+    .gds-comments .gds-like .gds-heart{
+      width:14px;height:14px;display:inline-block;transform:translateY(1px);
+      background:linear-gradient(90deg,var(--gds-accent-a),var(--gds-accent-b));
+      -webkit-mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"><path d="M12 21s-6.716-4.76-9.428-7.472C-0.072 10.928.39 7.2 3.343 5.657 5.41 4.57 7.867 5.09 9.364 6.586L12 9.222l2.636-2.636c1.497-1.496 3.954-2.016 6.02-0.929 2.954 1.543 3.415 5.271.771 7.871C18.716 16.24 12 21 12 21z"/></svg>') center/contain no-repeat;
+              mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"><path d="M12 21s-6.716-4.76-9.428-7.472C-0.072 10.928.39 7.2 3.343 5.657 5.41 4.57 7.867 5.09 9.364 6.586L12 9.222l2.636-2.636c1.497-1.496 3.954-2.016 6.02-0.929 2.954 1.543 3.415 5.271.771 7.871C18.716 16.24 12 21 12 21z"/></svg>') center/contain no-repeat;
+    }
+
+    /* CTA (더보기 링크) */
+    .gds-comments .gds-cta{margin-top:1.2rem;text-align:center;}
+    .gds-comments .gds-more-link{
+      display:inline-flex;align-items:center;gap:.5rem;
+      padding:.7rem 1.15rem;border-radius:999px;font-weight:800;text-decoration:none;
+      border:1px solid transparent;
+      background:
+        linear-gradient(#fff,#fff) padding-box,
+        linear-gradient(90deg,var(--gds-accent-a),var(--gds-accent-b)) border-box;
+      color:#111; box-shadow:var(--gds-shadow);
+      transition:transform .15s ease, box-shadow .15s ease;
+    }
+    .gds-comments .gds-more-link svg{width:16px;height:16px;flex:0 0 auto;}
+    .gds-comments .gds-more-link:hover{transform:translateY(-1px);box-shadow:0 10px 22px rgba(16,24,40,.12);}
+    .gds-comments .gds-more-link:active{transform:translateY(0);}
+
+    @media (min-width:720px){
+      .gds-comments .gds-card{grid-template-columns:56px 1fr;padding:1rem 1.1rem;}
+      .gds-comments .gds-avatar{width:56px;height:56px;}
+      .gds-comments .gds-thumb{width:116px;height:86px;}
+    }
+  </style>
+
+  <div class="gds-wrap">
+    <div class="gds-head">
+      <div class="gds-title">
+        <span class="gds-deco" aria-hidden="true"></span>
+        <h3 id="gds-comments-title">실시간 댓글</h3>
+      </div>
+      <!-- 요청: '검증된 후기' 배지 제거 완료 -->
+    </div>
+
+    <ul class="gds-list">
+      <!-- card 1 -->
+      <li class="gds-card">
+        <img class="gds-avatar" src="/img/avatars/a1.jpg" alt="오○○ 아바타">
+        <div>
+          <div class="gds-name-row">
+            <span class="gds-name">오○○</span>
+            <span class="gds-meta">도박 빚 · 2시간 전</span>
+          </div>
+          <div class="gds-body">추심 전화가 멈춘 게 가장 큽니다. 절차도 친절했고 숨통이 트였어요.</div>
+          <div class="gds-imgs">
+            <img class="gds-thumb" src="/img/reviews/r1-1.jpg" alt="상담 완료 문자 캡처">
+            <img class="gds-thumb" src="/img/reviews/r1-2.jpg" alt="상환 계획 안내 이미지">
+          </div>
+          <div class="gds-foot">
+            <span class="gds-like"><i class="gds-heart" aria-hidden="true"></i> 128</span>
+            <span>답글 3</span>
+            <div style="margin-left:auto;"></div>
+          </div>
+        </div>
+      </li>
+
+      <!-- card 2 -->
+      <li class="gds-card">
+        <img class="gds-avatar" src="/img/avatars/a2.jpg" alt="김○○ 아바타">
+        <div>
+          <div class="gds-name-row">
+            <span class="gds-name">김○○</span>
+            <span class="gds-meta">생활비 · 5시간 전</span>
+          </div>
+          <div class="gds-body">카드 돌려막기 하다가 신청했는데, 월 상환이 확 줄어 숨이 좀 쉬어집니다.</div>
+          <div class="gds-imgs">
+            <img class="gds-thumb" src="/img/reviews/r2-1.jpg" alt="상담 접수 확인">
+          </div>
+          <div class="gds-foot">
+            <span class="gds-like"><i class="gds-heart" aria-hidden="true"></i> 76</span>
+            <span>답글 1</span>
+            <div style="margin-left:auto;"></div>
+          </div>
+        </div>
+      </li>
+
+      <!-- card 3 -->
+      <li class="gds-card">
+        <img class="gds-avatar" src="/img/avatars/a3.jpg" alt="장○○ 아바타">
+        <div>
+          <div class="gds-name-row">
+            <span class="gds-name">장○○</span>
+            <span class="gds-meta">코인 · 1일 전</span>
+          </div>
+          <div class="gds-body">솔직히 기대 안 했는데 큰 폭으로 조정돼서 재정비 중입니다. 감사합니다.</div>
+          <div class="gds-imgs">
+            <img class="gds-thumb" src="/img/reviews/r3-1.jpg" alt="조정 결과 안내">
+            <img class="gds-thumb" src="/img/reviews/r3-2.jpg" alt="상담 요약 캡처">
+            <img class="gds-thumb" src="/img/reviews/r3-3.jpg" alt="문자 알림">
+          </div>
+          <div class="gds-foot">
+            <span class="gds-like"><i class="gds-heart" aria-hidden="true"></i> 203</span>
+            <span>답글 6</span>
+            <div style="margin-left:auto;"></div>
+          </div>
+        </div>
+      </li>
+    </ul>
+
+    <!-- 더보기: 참조 링크로 이동하는 예쁜 버튼 -->
+    <div class="gds-cta">
+      <a class="gds-more-link" href="https://gov-debtsupport.co.kr/#reviews" target="_blank" rel="noopener">
+        더 보기
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M5 12h12M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,270 @@
+<style>
+    /* container & animation */
+    #sm-consult {
+      max-width: 920px;
+      margin: 5rem auto;
+      padding: 3rem;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.1);
+      font-family: 'Noto Sans KR', sans-serif;
+      color: #222;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: gloryFadeInUp 0.8s ease-out forwards;
+    }
+    @keyframes gloryFadeInUp {
+      to { opacity:1; transform:translateY(0); }
+    }
+  
+    /* decorative bar */
+    #sm-consult .gc-deco {
+      width: 60px;
+      height: 6px;
+      background: linear-gradient(90deg,#dcbe4e,#f8e18c);
+      margin: 0 auto 1rem;
+      border-radius: 3px;
+    }
+  
+    /* header */
+    #sm-consult .gc-header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+    #sm-consult .gc-header h2 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+    #sm-consult .gc-header h2 span {
+      display: block;
+      font-size: 1.8rem;
+      color: #dcbe4e;
+      margin-top: 0.2rem;
+    }
+    #sm-consult .gc-header p {
+      margin-top: 0.5rem;
+      font-size: 1rem;
+      color: #555;
+      line-height: 1.6;
+    }
+  
+    /* step bar */
+    #sm-consult .gc-stepbar {
+      margin-bottom: 2rem;
+    }
+    #sm-consult .gc-progress {
+      height: 4px;
+      background: #eee;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    #sm-consult .gc-progress-fill {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg,#dcbe4e,#bfa742);
+      transition: width 0.5s ease;
+    }
+  
+    /* form and rows */
+    #sm-consult .gc-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.8rem;
+    }
+    #sm-consult .gc-row {
+      display: flex;
+      gap: 1rem;
+    }
+    #sm-consult .gc-full {
+      flex-direction: column;
+    }
+  
+    /* labels & inputs */
+    #sm-consult label {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    #sm-consult label span {
+      margin-bottom: 0.4rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+    #sm-consult .req {
+      color: #d33;
+      margin-left: 0.2rem;
+    }
+    #sm-consult input,
+    #sm-consult select,
+    #sm-consult textarea {
+      padding: 0.75rem 1rem;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    #sm-consult input:focus,
+    #sm-consult select:focus,
+    #sm-consult textarea:focus {
+      border-color: #dcbe4e;
+      box-shadow: 0 0 0 4px rgba(220,190,78,0.2);
+      outline: none;
+    }
+    #sm-consult textarea {
+      min-height: 160px;
+      resize: vertical;
+    }
+  
+    /* remove default iOS select styling */
+    #sm-consult select {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background-color: #fff;
+      background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23999' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      background-size: 10px 6px;
+      padding-right: 2.5rem;
+    }
+    #sm-consult select::-ms-expand {
+      display: none;
+    }
+  
+    /* inline date */
+    #sm-consult .gc-inline {
+      max-width: 240px;
+    }
+  
+    /* footer */
+    #sm-consult .gc-footer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 2rem;
+      flex-direction: column;
+    }
+    #sm-consult .gc-consent {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      flex-direction: row;
+    }
+    #sm-consult .gc-button {
+      background: linear-gradient(90deg,#dcbe4e,#bfa742);
+      padding: 0.85rem 2.2rem;
+      border: none;
+      border-radius: 30px;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #333;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      min-width: 160px;
+    }
+    #sm-consult .gc-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+  
+    /* responsive */
+    @media (max-width: 768px) {
+      #sm-consult .gc-row {
+        flex-direction: column;
+      }
+      #sm-consult .gc-footer {
+        flex-direction: column-reverse;
+        gap: 1rem;
+      }
+    }
+  </style>
+  
+  <section id="sm-consult" style="text-align: left;">
+    <div class="gc-deco"></div>
+    <div class="gc-header">
+      <h2>서민채무조정안심센터<br><span>무료상담신청</span></h2>
+      <p>지금 신청하면 채무 걱정이 사라집니다.<br>당신의 빚, 이젠 여기서 끝내세요.</p>
+    </div>
+  
+    <div class="gc-stepbar">
+      <div class="gc-progress"><div class="gc-progress-fill"></div></div>
+    </div>
+  
+    <form id="form_e11" name="frm_phonecall_web" action="" method="post" target="hidden_iframe11" onsubmit="dll(); submitted=true;" class="gc-form" novalidate>
+      <input type="hidden" name="entry.637408694" value="본문 신청폼">  
+      <input type="hidden" name="entry.339503137" value="당근">
+  
+      <div class="gc-row">
+        <label><span>이름<span class="req">*</span></span>
+          <input type="text" name="entry.1584470138" placeholder="성함을 입력해주세요." maxlength="4">
+        </label>
+        <label><span>연락처<span class="req">*</span></span>
+          <input type="text" name="entry.730014522" placeholder="연락처를 입력해주세요." maxlength="11" required>
+        </label>
+      </div>
+  
+      <div class="gc-row">
+        <label><span>채무금액<span class="req">* (2000만원 이상 신청가능)</span></span>
+          <select name="entry.1263415590">
+            <option selected disabled>채무금액 선택 </option>
+            <option value="2000~5000만원 미만">2000~5000만원 미만</option>
+            <option value="5000~8000만원 미만">5000~8000만원 미만</option>
+            <option value="8000~1억원 미만">8000~1억원 미만</option>
+            <option value="1-3억">1-3억</option>
+            <option value="3-5억">3-5억</option>
+            <option value="5억 이상">5억 이상</option>
+          </select>
+        </label>
+      </div>
+  
+      <div class="gc-row">
+        <label><span>직업 선택<span class="req">*</span></span>
+          <select name="entry.966666468">
+            <option selected disabled>직업 선택</option>
+            <option value="직장인">직장인</option>
+            <option value="사업자">사업자</option>
+            <option value="프리랜서">프리랜서</option>
+            <option value="무직">무직</option>
+            <option value="기타">기타</option>
+          </select>
+        </label>
+      </div>
+  
+      <div class="gc-row">
+        <label><span>월 소득<span class="req">*</span></span>
+          <select name="entry.820371290">
+            <option selected disabled>월소득 선택</option>
+            <option value="100만원 미만">100만원 미만</option>
+            <option value="100-200만원">100-200만원</option>
+            <option value="200-500만원">200-500만원</option>
+            <option value="500-700만원">500-700만원</option>
+            <option value="700-1,000만원">700-1,000만원</option>
+            <option value="1,000만원 이상">1,000만원 이상</option>
+          </select>
+        </label>
+      </div>
+  
+      <div class="gc-row gc-full">
+        <label><span>상담내용</span>
+          <textarea name="entry.1470467061" placeholder="상담하고 싶은 내용을 남겨주세요."></textarea>
+        </label>
+      </div>
+  
+      <div class="gc-row gc-footer">
+        <label class="gc-consent">
+          <input type="checkbox" name="agree_r1" id="agree11" checked>
+          개인정보 수집·이용에 동의합니다.<span class="req">*</span>
+        </label>
+        <span class="privacyBtn" onclick="privacyPopUp()" style="font-size:13px;cursor:pointer;">
+          [개인정보취급동의]
+        </span>
+        <input type="submit" class="gc-button" value="무료 상담 신청하기" disabled>
+      </div>
+    </form>
+  </section>
+  
