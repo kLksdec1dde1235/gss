@@ -20,7 +20,7 @@
       padding-bottom:1.5rem;
       touch-action:pan-y; /* 세로 스크롤은 브라우저 기본 동작 허용 */
     }
-    #nb3 .nb3-slider-wrapper{display:flex;gap:1.5rem;transition:transform .1s.ease;will-change:transform;}
+    #nb3 .nb3-slider-wrapper{display:flex;gap:1.5rem;transition:transform .1s ease;will-change:transform;}
     #nb3 .nb3-product-slide{
       display:block;
       width:350px;
@@ -242,7 +242,7 @@
         track.style.transform = `translateX(${tx}px)`;
         setTimeout(() => {
           slider.classList.remove('animating');
-          track.style.transition = 'transform .1s.ease';
+          track.style.transition = 'transform .1s ease';
         }, 600);
       } else {
         track.style.transition = 'transform .1s ease';
@@ -295,9 +295,10 @@
       raf = null,
       isTouchMode = false;
 
-    const TH = 8,
-      FRICTION = 0.95,
-      MIN_V = 0.8;
+    // 🔧 드래그 부드러움 튜닝
+    const TH = 4,           // 스와이프 인식 임계값 (기존 8 → 더 민감하게)
+      FRICTION = 0.965,    // 관성 마찰 (기존 0.95 → 조금 더 오래 미끄러짐)
+      MIN_V = 0.45;        // 관성 시작 최소 속도 (기존 0.8 → 더 자주 관성 적용)
 
     function getTX() {
       const m = track.style.transform.match(/translateX\((-?\d+(?:\.\d+)?)px\)/);
@@ -369,7 +370,8 @@
         track.style.transform = `translateX(${next}px)`;
 
         const iv = dx / dt;
-        v = v * 0.8 + iv * 0.2;
+        // 🔧 속도 계산도 조금 더 부드럽게 (가중치 조정)
+        v = v * 0.7 + iv * 0.3;
 
         // 수평 드래그 중일 때만 기본 동작 막기 → 세로 스크롤과 충돌 방지
         if (e.cancelable) e.preventDefault();
@@ -395,7 +397,8 @@
           raf = null;
           return;
         }
-        curTX += v * 16; // ~60fps
+        // 🔧 관성 거리도 약간 늘려 더 미끄럽게
+        curTX += v * 18; // ~60fps 기준, 한 프레임 이동량
         const minT = -(maxIndex * (cardWidth + gap));
         const maxT = 0;
         if (curTX > maxT || curTX < minT) {
@@ -419,6 +422,7 @@
         else snap();
         // 수평 드래그를 실제로 했던 경우에만 기본 동작 방지
         if (e && e.cancelable) e.preventDefault();
+        resumeAutoLater();
       } else {
         resumeAutoLater();
       }
