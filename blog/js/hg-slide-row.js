@@ -1,4 +1,3 @@
-// ./js/hg-slide.js
 (function () {
   // nb3 섹션 HTML 템플릿 (기존 코드 그대로, <script> 부분만 제거)
   const NB3_TEMPLATE = `
@@ -14,8 +13,14 @@
     @media(min-width:768px){#nb3 .nb3-title{font-size:2rem;line-height:1.4}}
     #nb3 .nb3-nav-group{display:flex;gap:.5rem}
     #nb3 .nb3-btn{width:40px;height:40px;border:none;border-radius:9999px;background:#0f172a;color:#fff;cursor:pointer}
-    #nb3 .nb3-slider-container{display:flex;overflow:hidden;padding-bottom:1.5rem;}
-    #nb3 .nb3-slider-wrapper{display:flex;gap:1.5rem;transition:transform .1s.ease;will-change:transform;}
+    /* 🔹 모바일에서 세로 스크롤을 살리기 위한 설정 */
+    #nb3 .nb3-slider-container{
+      display:flex;
+      overflow:hidden;
+      padding-bottom:1.5rem;
+      touch-action:pan-y; /* 세로 스크롤은 브라우저 기본 동작 허용 */
+    }
+    #nb3 .nb3-slider-wrapper{display:flex;gap:1.5rem;transition:transform .1s ease;will-change:transform;}
     #nb3 .nb3-product-slide{
       display:block;
       width:350px;
@@ -202,7 +207,7 @@
     rings.forEach((el) => io.observe(el));
   }
 
-  // 🔹 nb3 슬라이더 초기화 (기존 nb1/nb2 패턴 그대로)
+  // 🔹 nb3 슬라이더 초기화 (기존 nb1/nb2 패턴 + 모바일 세로 스크롤 허용)
   function initNb3Slider(root) {
     const slider = root.querySelector('#nb3Slider');
     const track = slider ? slider.querySelector('.nb3-slider-wrapper') : null;
@@ -281,16 +286,19 @@
     let isDragging = false,
       started = false;
     let startX = 0,
+      startY = 0,
       startTX = 0,
       curTX = 0,
       lastX = 0,
       lastT = 0,
       v = 0,
-      raf = null;
+      raf = null,
+      isTouchMode = false;
 
-    const TH = 8,
-      FRICTION = 0.95,
-      MIN_V = 0.8;
+    // 🔧 드래그 부드러움 튜닝
+    const TH = 4,           // 스와이프 인식 임계값 (기존 8 → 더 민감하게)
+      FRICTION = 0.965,    // 관성 마찰 (기존 0.95 → 조금 더 오래 미끄러짐)
+      MIN_V = 0.45;        // 관성 시작 최소 속도 (기존 0.8 → 더 자주 관성 적용)
 
     function getTX() {
       const m = track.style.transform.match(/translateX\((-?\d+(?:\.\d+)?)px\)/);
@@ -299,9 +307,14 @@
 
     function onStart(e) {
       if (e.type === 'mousedown' && e.button !== 0) return;
+      const touchEvent = e.type.startsWith('touch');
+      isTouchMode = touchEvent;
+
+      const point = touchEvent ? e.touches[0] : e;
       isDragging = true;
       started = false;
-      startX = e.touches ? e.touches[0].clientX : e.clientX;
+      startX = point.clientX;
+      startY = point.clientY;
       startTX = getTX();
       curTX = startTX;
       lastX = startX;
@@ -313,17 +326,38 @@
         raf = null;
       }
       pauseAuto();
-      e.preventDefault();
+
+      // 마우스 드래그에서는 기본 동작 막아 텍스트 선택 방지
+      if (!touchEvent && e.cancelable) e.preventDefault();
     }
 
     function onMove(e) {
       if (!isDragging) return;
+      const touchEvent = e.type.startsWith('touch');
+      const point = touchEvent ? e.touches[0] : e;
       const now = performance.now();
-      const x = e.touches ? e.touches[0].clientX : e.clientX;
+      const x = point.clientX;
+      const y = point.clientY;
       const dx = x - lastX;
       const dt = Math.max(1, now - lastT);
 
-      if (!started && Math.abs(x - startX) > TH) started = true;
+      // 🔹 처음 움직임에서 수평/수직 제스처 구분
+      if (!started) {
+        const totalDX = x - startX;
+        const totalDY = y - startY;
+
+        // 수평 스와이프라고 판단
+        if (Math.abs(totalDX) > TH && Math.abs(totalDX) > Math.abs(totalDY)) {
+          started = true;
+        }
+        // 수직 스크롤 의도 → 드래그 취소하고 브라우저 기본 스크롤에 맡김
+        else if (Math.abs(totalDY) > TH && Math.abs(totalDY) > Math.abs(totalDX)) {
+          isDragging = false;
+          slider.classList.remove('dragging');
+          resumeAutoLater();
+          return; // ❗️preventDefault 호출 X → 페이지가 자연스럽게 아래로 스크롤
+        }
+      }
 
       if (started) {
         let next = startTX + (x - startX);
@@ -336,12 +370,15 @@
         track.style.transform = `translateX(${next}px)`;
 
         const iv = dx / dt;
-        v = v * 0.8 + iv * 0.2;
+        // 🔧 속도 계산도 조금 더 부드럽게 (가중치 조정)
+        v = v * 0.7 + iv * 0.3;
+
+        // 수평 드래그 중일 때만 기본 동작 막기 → 세로 스크롤과 충돌 방지
+        if (e.cancelable) e.preventDefault();
       }
 
       lastX = x;
       lastT = now;
-      e.preventDefault();
     }
 
     function snap() {
@@ -360,7 +397,8 @@
           raf = null;
           return;
         }
-        curTX += v * 16; // ~60fps
+        // 🔧 관성 거리도 약간 늘려 더 미끄럽게
+        curTX += v * 18; // ~60fps 기준, 한 프레임 이동량
         const minT = -(maxIndex * (cardWidth + gap));
         const maxT = 0;
         if (curTX > maxT || curTX < minT) {
@@ -378,14 +416,16 @@
       if (!isDragging) return;
       isDragging = false;
       slider.classList.remove('dragging');
+
       if (started) {
         if (Math.abs(v) > MIN_V) momentum();
         else snap();
+        // 수평 드래그를 실제로 했던 경우에만 기본 동작 방지
+        if (e && e.cancelable) e.preventDefault();
         resumeAutoLater();
       } else {
         resumeAutoLater();
       }
-      e.preventDefault();
     }
 
     slider.addEventListener('mousedown', onStart, { passive: false });
