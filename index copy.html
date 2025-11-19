@@ -120,6 +120,12 @@
     #sidebar{display:none}
   </style>
 
+<script type="text/javascript" charset="UTF-8" src="//t1.daumcdn.net/kas/static/kp.js"></script>
+<script type="text/javascript">
+      kakaoPixel('2681834056762212664').pageView();
+</script>
+
+
 
 <style>
 
@@ -2249,6 +2255,9 @@ btns2.forEach(btn => {
   </script>
 </section>
 
+
+
+
 <section id="consultFormSection">
   <style>
   
@@ -2454,10 +2463,10 @@ btns2.forEach(btn => {
     }
   </style>
 
-  <div id="consultForm">
+ <div id="consultForm">
      <form id="form_e11" name="frm_phonecall_web" action="" method="post" target="hidden_iframe11" onsubmit="dll(); submitted=true;"  class="gc-form" novalidate>
     <input type="hidden" name="entry.637408694" value="본문 신청폼">  
-    <input type="hidden" name="entry.339503137" value="당근 - 영상 - 서민채무 - 더엘">
+    <input type="hidden" name="entry.339503137" value="당근 - 서민채무 - 더엘">
     <div class="gc-deco"></div>
 
     <div class="gc-header">
@@ -2531,9 +2540,22 @@ btns2.forEach(btn => {
       <input type="hidden" name="entry.277781686" id="loan_3month">
     </div>
 
+
+     <!-- 05. 최근대출유무 -->
+    <div class="form-group">
+      <p class="form-label">06. 부동산 유무 <small>(배우자 명의 포함)</small></p>
+      <div class="button-group" data-type="radio" data-name="부동산유무">
+        <input type="button"   class="option-btn intro_select6" data-value="있음" value="있음">
+        <input type="button"   class="option-btn intro_select6" data-value="없음" value="없음">
+      </div>
+      <input type="hidden" name="entry.2018620676" id="realstate">
+    </div>
+
+
+
     <!-- 06. 채무 원인 -->
     <div class="form-group">
-      <p class="form-label">06. 채무 원인 <small>(다중선택가능)</small></p>
+      <p class="form-label">07. 채무 원인 <small>(다중선택가능)</small></p>
       <div class="button-group" data-type="checkbox" data-name="채무원인">
         <input type="button" class="option-btn intro_select5"  data-value="사기(전세,보이스피싱)" value="사기(전세,보이스피싱)">
         <input type="button" class="option-btn intro_select5"  data-value="생활비로 인한 채무" value="생활비로 인한 채무">
@@ -2545,24 +2567,20 @@ btns2.forEach(btn => {
       <input type="hidden" name="entry.1487248962" id="reason">
     </div>
 
-
-        <!-- 05. 최근대출유무 -->
-    <div class="form-group">
-      <p class="form-label">07. 부동산 유무 (배우자 포함)</p>
-      <div class="button-group" data-type="radio" data-name="부동산유무">
-        <input type="button"   class="option-btn intro_select6" data-value="있음" value="있음">
-        <input type="button"   class="option-btn intro_select6" data-value="없음" value="없음">
-      </div>
-      <input type="hidden" name="entry.277781686" id="loan_3month">
-    </div>
-
-    
-
     <!-- 기본 정보 -->
     <div class="form-group">
       <p class="form-label">성함 / 거주지 / 연락처</p>
       <div class="inline-fields">
         <input type="text"  id="name" name="entry.1584470138"  placeholder="성함 입력" maxlength="4" style="min-height:60px;font-size:1rem;">
+      
+        <input type="text" id="phone" name="entry.730014522" placeholder="연락처 입력 (-없이 입력해주세요.)." maxlength="11" style="min-height:60px;font-size:1rem;">
+      </div>
+    </div>
+
+ <!-- 기본 정보 -->
+    <div class="form-group">
+      <p class="form-label">거주지 / 상담가능시간</p>
+      <div class="inline-fields">
        <div class="select-wrap">
             <select name="entry.1911857506" id="location" required>
               <option value="" disabled selected hidden>거주지 선택</option>
@@ -2585,9 +2603,28 @@ btns2.forEach(btn => {
               <option value="전라남도">전라남도</option>
             </select>
           </div>
-        <input type="text" id="phone" name="entry.730014522" placeholder="연락처 입력 (-없이 입력해주세요.)." maxlength="11" style="min-height:60px;font-size:1rem;">
+
+             <div class="select-wrap">
+            <select name="entry.1971910392" id="time_c" required>
+              <option value="" disabled selected hidden>상담가능시간</option>
+                         <option value="통화가능시간" selected="" disabled="">통화가능시간</option>
+                         <option value="언제나 통화 가능">언제나 통화 가능</option>
+                        <option value="오전 09:00~10:00">오전 09:00 ~ 10:00</option>
+                        <option value="오전 10:00~11:00">오전 10:00 ~ 11:00</option>
+                        <option value="오전 11:00~12:00">오전 11:00 ~ 12:00</option>
+                        <option value="점심 12:00~01:00">점심 12:00 ~ 01:00</option>
+                        <option value="오후 01:00~02:00">오후 01:00 ~ 02:00</option>
+                        <option value="오후 02:00~03:00">오후 02:00 ~ 03:00</option>
+                        <option value="오후 03:00~04:00">오후 03:00 ~ 04:00</option>
+                        <option value="오후 04:00~05:00">오후 04:00 ~ 05:00</option>
+                        <option value="오후 05:00~06:00">오후 05:00 ~ 06:00</option>
+                        <option value="오후 06:00~07:00">오후 06:00 ~ 07:00</option>
+            </select>
+          </div>
       </div>
     </div>
+
+
 
      <div class="form-group">
       <p class="form-label">상담 내용</p>
@@ -2650,7 +2687,6 @@ btns2.forEach(btn => {
     //   alert('상담 신청이 접수되었습니다!');
     // });
   </script>
-</section>
 
 
   <script>
@@ -2660,6 +2696,7 @@ btns2.forEach(btn => {
     bindRadioToHidden(".intro_select",  "debt");
     bindRadioToHidden(".intro_select3", "family");
     bindRadioToHidden(".intro_select4", "loan_3month");
+    bindRadioToHidden(".intro_select6", "realstate");
 
     function bindRadioToHidden(selector, hiddenId) {
       const buttons = document.querySelectorAll(selector);
@@ -2704,6 +2741,10 @@ btns2.forEach(btn => {
     });
   });
 </script>
+
+</section>
+
+
 
 <section id="NoticeS1" aria-label="안심 안내문">
   <style>
@@ -3682,7 +3723,7 @@ btns2.forEach(btn => {
 <script src="./js/main1.js"></script>
 <script src="./js/menu1.js" defer></script>
 <script src="./js/personal.js"></script>
-<script src="./js/validation1.js"></script>
+<script src="./js/validation3.js"></script>
 
 
 
