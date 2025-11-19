@@ -443,19 +443,7 @@
       });
     })();
 
-    // ====== 개인정보 동의 여부에 따른 submit 버튼 활성/비활성 ======
-    const agree = section.querySelector("#agree11");
-    const submitBtn = section.querySelector("#send_message");
-
-    function toggleSubmit() {
-      if (!submitBtn) return;
-      submitBtn.disabled = !(agree && agree.checked);
-    }
-
-    if (agree) {
-      toggleSubmit();
-      agree.addEventListener("change", toggleSubmit);
-    }
+  
 
     // ====== 개인정보취급동의 버튼 클릭 처리 ======
     const privacyBtn = section.querySelector(".privacyBtn");

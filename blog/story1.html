@@ -25,30 +25,129 @@
 </head>
 <body class="bg-gray-50">
 <!-- 헤더 섹션 -->
-<header class="bg-white shadow-sm">
-<div class="container mx-auto px-4 py-4 flex items-center justify-between">
-<div class="flex items-center">
-<a href="../blog.html" class="text-sm "><img src="../img/logo_on.png" style="max-width:140px;"></a>
-<nav class="hidden md:flex ml-10">
-<!-- <a href="#" class="mx-3 text-gray-700 hover:text-primary transition-colors">홈</a>
-<a href="#" class="mx-3 text-gray-700 hover:text-primary transition-colors">칼럼</a>
-<a href="#" class="mx-3 text-gray-700 hover:text-primary transition-colors">서비스</a>
-<a href="#" class="mx-3 text-gray-700 hover:text-primary transition-colors">사례</a>
-<a href="#" class="mx-3 text-gray-700 hover:text-primary transition-colors">문의</a> -->
-</nav>
-</div>
-<div class="flex items-center">
-<!-- <button class="mr-4 px-5 py-2 text-gray-700 hover:text-primary transition-colors flex items-center whitespace-nowrap">
-<div class="w-5 h-5 flex items-center justify-center mr-1">
-<i class="ri-line-chart-line"></i>
-</div>
-<a href="../ad-test.html">광고 자가 진단</a>
-</button> -->
-<a href="../index.html" class="floating-btn text-white px-5 py-2 !rounded-button whitespace-nowrap transition-colors">무료 상담 신청</a>
-
-</div>
-</div>
+<header id="appHeader" class="bg-white shadow-sm">
+  <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+    <div class="flex items-center">
+      <a href="./blog.html" class="text-sm "><img src="../img/logo_on.png" style="max-width:140px;"></a>
+      <nav class="hidden md:flex ml-10">
+        <!-- <a href="#" class="mx-3 text-gray-700 hover:text-primary transition-colors">홈</a>
+        <a href="#" class="mx-3 text-gray-700 hover:text-primary transition-colors">칼럼</a>
+        <a href="#" class="mx-3 text-gray-700 hover:text-primary transition-colors">서비스</a>
+        <a href="#" class="mx-3 text-gray-700 hover:text-primary transition-colors">사례</a>
+        <a href="#" class="mx-3 text-gray-700 hover:text-primary transition-colors">문의</a> -->
+      </nav>
+    </div>
+    <div class="flex items-center">
+      <!-- <button class="mr-4 px-5 py-2 text-gray-700 hover:text-primary transition-colors flex items-center whitespace-nowrap">
+      <div class="w-5 h-5 flex items-center justify-center mr-1">
+      <i class="ri-line-chart-line"></i>
+      </div>
+      <a href="../ad-test.html">광고 자가 진단</a>
+      </button> -->
+      <a href="../index.html" class="floating-btn text-white px-5 py-2 !rounded-button whitespace-nowrap transition-colors">무료 상담 신청</a>
+    </div>
+  </div>
 </header>
+
+<!-- ▼▼▼ 스크롤 감지 전용 스타일 ▼▼▼ -->
+<style>
+  /* 헤더를 고정하고 부드럽게 위/아래로 슬라이드 */
+  #appHeader{
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 1000;
+    transform: translateY(0);
+    transition: transform .36s ease, background-color .24s ease, box-shadow .24s ease;
+    will-change: transform;
+    backface-visibility: hidden;
+  }
+  /* 숨김 상태: 위로 밀어 올리기 */
+  #appHeader.is-hidden{
+    transform: translateY(-110%);
+  }
+  /* 스크롤이 조금이라도 된 상태에서 살짝 더 또렷한 느낌(선택 사항) */
+  #appHeader.has-scrolled{
+    background-color: #ffffffee; /* 약간 투명하면 더 고급스럽게 보임 */
+    box-shadow: 0 6px 20px rgba(0,0,0,.06);
+  }
+
+  /* 본문이 헤더 밑으로 숨지 않도록 상단 패딩을 동적으로 채우기 위한 초기값 */
+  html.has-header-padding body{
+    padding-top: var(--app-header-h, 64px);
+  }
+</style>
+
+<!-- ▼▼▼ 스크립트: 스크롤 방향에 따라 헤더 표시/숨김 ▼▼▼ -->
+<script>
+(function(){
+  const header = document.getElementById('appHeader');
+  if(!header) return;
+
+  // 초기 한번 헤더 높이를 측정하여 본문 상단 패딩 확보(레이아웃 점프 방지)
+  const setHeaderPadding = () => {
+    const h = header.getBoundingClientRect().height;
+    document.documentElement.classList.add('has-header-padding');
+    document.documentElement.style.setProperty('--app-header-h', h + 'px');
+  };
+  setHeaderPadding();
+  // 윈도우 리사이즈/폰트 로딩 후에도 재계산
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(setHeaderPadding, 120);
+  });
+
+  let lastY = window.pageYOffset || document.documentElement.scrollTop || 0;
+  let ticking = false;
+
+  const THRESHOLD = 6;        // 미세 스크롤 무시 임계값(px)
+  const SHOW_AFTER = 24;      // 상단 근처에서는 항상 보여주기(부드러운 UX)
+
+  const onScroll = () => {
+    const y = window.pageYOffset || document.documentElement.scrollTop || 0;
+
+    if (!ticking) {
+      window.requestAnimationFrame(() => {
+        const delta = y - lastY;
+
+        // 스크롤 조금이라도 하면 상태 클래스
+        if (y > 2) {
+          header.classList.add('has-scrolled');
+        } else {
+          header.classList.remove('has-scrolled');
+        }
+
+        // 상단 근처에서는 무조건 표시
+        if (y < SHOW_AFTER) {
+          header.classList.remove('is-hidden');
+          lastY = y;
+          ticking = false;
+          return;
+        }
+
+        // 방향 판별 (임계값 이상일 때만 반응)
+        if (Math.abs(delta) > THRESHOLD) {
+          if (delta > 0) {
+            // 아래로 스크롤 → 헤더 숨김
+            header.classList.add('is-hidden');
+          } else {
+            // 위로 스크롤 → 헤더 표시
+            header.classList.remove('is-hidden');
+          }
+        }
+
+        lastY = y;
+        ticking = false;
+      });
+      ticking = true;
+    }
+  };
+
+  document.addEventListener('scroll', onScroll, {passive:true});
+
+  // 페이지 최초 로드 시 위치에 맞게 상태 초기화
+  onScroll();
+})();
+</script>
 <!-- 메인 콘텐츠 -->
 <main class="container mx-auto px-4 py-8 md:py-12">
 <!-- 히어로 섹션 -->
@@ -56,12 +155,12 @@
 <img src="./img/story-2.jpg" alt="개인회생으로 빚 문제를 해결한 39세 소상공인 후기" class="w-full h-[400px] object-cover object-top">
 <div class="absolute inset-0 bg-gradient-to-r from-black/70 to-black/30 flex items-center">
 <div class="px-6 md:px-12 max-w-3xl">
-<h1 class="text-2xl md:text-4xl lg:text-4xl font-bold text-white mb-4" style="line-height:140%;">8,671만원 빚, 배우자 모르게<br>이자 100% 원금 75% 탕감받은<br>39세 소상공인의 이야기</h1>
-<p class="text-white/90 text-lg mb-6">연체를 일주일 앞둔 상황에서,월 340만원 상환을 61만원대로 줄이기까지…<br>실제 의뢰인이 들려주는 개인회생 후기입니다.</p>
+<h1 class="text-2xl md:text-4xl lg:text-4xl font-bold text-white mb-4" style="line-height:140%;">8,671만원 빚, 배우자 모르게<br><b class="highlight_blog">이자 100% 원금 75% 탕감</b>받은<br>39세 소상공인의 이야기</h1>
+<p class="text-white/90 text-lg mb-6">연체를 일주일 앞둔 상황에서<br>월 340만원 상환을 61만원대로 줄이기까지…</p>
 <div class="flex items-center text-white/80">
 <img src="../img/favicon.png" class="w-12 h-12 rounded-full mr-4 object-cover">
 <div>
-<p class="font-medium">서민채무조정안심센터 · 실제 의뢰인 후기 기반</p>
+<p class="font-medium">서민채무조정안심센터</p>
 </div>
 </div>
 </div>
@@ -85,15 +184,152 @@
 <div class="w-6 h-6 flex items-center justify-center mr-1">
 <i class="ri-user-line"></i>
 </div>
-<span>울산 거주 39세 소상공인 의뢰인</span>
+<span>울산 거주 39세</span>
 </div>
 </div>
 <div class="highlight-box text-gray-700">
-<strong>거주지: 울산 · 나이: 39세 · 가족: 배우자, 미성년 자녀<br>
-월소득: 2,386,170원 · 총 채무: 86,718,214원(12곳)</strong><br><br>
+
 연체까지 일주일 남은 상황, 과거 독촉의 공포 때문에 밤에 제대로 눈을 감을 수 없었습니다.<br>
-무엇보다 <strong>“배우자에게만은 절대 들키고 싶지 않다”</strong>는 마음이 가장 컸습니다.<br><br>
-이 글은 그런 상황에서 실제로 <strong>이자 100% 탕감, 원금 75% 조정, 월 상환 340만원 → 61만원대</strong>로 줄이기까지 제가 겪은 과정을 담은 후기입니다.
+무엇보다 <strong>“배우자에게만은 절대 들키고 싶지 않다”</strong>는 마음이 가장 컸습니다.
+</div>
+
+               <style>
+      /* ===== 의뢰인 기본 정보 카드 ===== */
+.case-summary-card{
+  margin-top:18px;
+  padding:20px 22px;
+  border-radius:18px;
+  background:#ffffff;
+  border:1px solid #e5e7f5;             /* 연한 퍼플톤 테두리 */
+  box-shadow:0 18px 40px rgba(15,23,42,.06);
+}
+
+/* 상단 라벨 영역 */
+.case-summary-header{
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  margin-bottom:10px;
+}
+
+.case-summary-chip{
+  display:inline-flex;
+  align-items:center;
+  padding:4px 12px;
+  border-radius:999px;
+  font-size:0.78rem;
+  font-weight:600;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:#4f46e5;                         /* 인디고 계열 메인 포인트 */
+  background:rgba(129,140,248,.12);      /* 아주 연한 라벤더 배경 */
+}
+
+.case-summary-chip::before{
+  content:"";
+  display:inline-block;
+  width:6px;
+  height:6px;
+  border-radius:999px;
+  background:#4f46e5;
+  margin-right:6px;
+}
+
+/* 테이블 */
+.case-summary-table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:0.95rem;
+  margin-top:4px;
+}
+
+.case-summary-table th,
+.case-summary-table td{
+  padding:7px 0;
+  vertical-align:top;
+}
+
+.case-summary-table th{
+  width:120px;
+  padding-right:12px;
+  font-weight:600;
+  color:#6b7280;                         /* 회색 라벨 텍스트 */
+  white-space:nowrap;
+}
+
+.case-summary-table td{
+  color:#111827;
+}
+
+/* 행 구분선 – 아주 연한 점선 */
+.case-summary-table tr + tr th,
+.case-summary-table tr + tr td{
+  border-top:1px dashed rgba(148,163,184,.45);
+}
+
+/* ===== 모바일 최적화 ===== */
+@media (max-width:768px){
+  .case-summary-card{
+    margin-top:16px;
+    padding:16px 14px;
+    border-radius:16px;
+  }
+  .case-summary-table{
+    font-size:0.9rem;
+  }
+  .case-summary-table th{
+    width:96px;
+    font-size:0.86rem;
+  }
+}
+
+@media (max-width:480px){
+  .case-summary-card{
+    padding:14px 12px;
+  }
+  .case-summary-chip{
+    font-size:0.75rem;
+  }
+
+    .case-summary-table th{
+    width:76px;
+    font-size:0.86rem;
+  }
+}
+
+            </style>
+
+      <div class="case-summary-card">
+  <div class="case-summary-label">의뢰인 기본 정보</div>
+  <table class="case-summary-table">
+    <tbody>
+      <tr>
+        <th>거주지</th>
+        <td>울산광역시</td>
+      </tr>
+      <tr>
+        <th>나이 / 가족</th>
+        <td>39세 · 배우자, 미성년 자녀</td>
+      </tr>
+      <tr>
+        <th>직업</th>
+        <td>직장인</td>
+      </tr>
+      <tr>
+        <th>재직기간</th>
+        <td>2년</td>
+      </tr>
+      <tr>
+        <th>월 소득</th>
+        <td>2,386,170원</td>
+      </tr>
+      <tr>
+        <th>총 채무</th>
+        <td>86,718,214원 (채권자 12곳)</td>
+      </tr>
+    </tbody>
+  </table>
+
 </div>
 </header>
 <div class="article-content">
@@ -130,7 +366,7 @@
 <p>무엇보다도 <strong>배우자에게 절대 알리고 싶지 않았습니다.</strong> “내가 잘못해서 이렇게 된 것 같아서” 죄책감이 컸고, 하루에도 몇 번씩 ‘차라리 혼자 사라져버릴까’ 같은 극단적인 생각까지 스쳐 지나갔습니다.</p>
 
 <div class="bg-gray-50 rounded-lg p-5 my-6">
-<h3 class="text-lg font-semibold mb-3">부채 상황</h3>
+<h3 class="text-lg font-semibold mb-3">당시 부채</h3>
 <div class="overflow-x-auto">
 
 
@@ -185,7 +421,7 @@
 
 <img src="./img/story-3.png" style="border:1px solid #00000020;border-radius:10px;max-width:400px;">
 
-<h2 class="text-2xl font-bold text-gray-800 mt-8 mb-4">3. 이자 100% · 원금 75% 탕감,<br>월 340만원 상환이 61만원대로 줄었습니다</h2>
+<h2 class="text-2xl font-bold text-gray-800 mt-8 mb-4">3. <b class="highlight_blog">이자 100% · 원금 75% 탕감</b>,<br>월 340만원 상환이 61만원대로 줄었습니다</h2>
 <p>개인회생 개시 결정은 생각보다 제 삶을 크게 바꿔놓았습니다.</p>
 <ul class="my-4 space-y-2 pl-6 list-disc">
 <li>생활에 필요한 최소 생계비로 <strong>1,773,316원</strong>이 인정되었고,</li>
@@ -222,7 +458,7 @@
 
 <!-- 광고 효율 자체 진단 섹션 → 개인회생 자가 점검 섹션으로 텍스트만 변경 -->
 <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg shadow-sm p-6" style="margin:30px 0 0;">
-<h2 class="text-2xl font-bold text-gray-800 mb-4">✅ 나도 개인회생 대상인지, 지금 간단히 점검해보세요</h2>
+<h2 class="text-2xl font-bold text-gray-800 mb-4">✅ 부채 문제로 힘들다면, 지금 간단히 진단 해보세요</h2>
 <div class="space-y-4 mb-6">
 <div class="flex items-start">
 <div class="w-6 h-6 flex items-center justify-center mr-2 mt-1">
@@ -246,7 +482,7 @@
 <p class="mb-6">위 질문 중 하나라도 해당된다면, 저처럼 <strong>지금이 방향을 바꿀 마지막 타이밍</strong>일 수도 있습니다.</p>
 <div class="text-center">
 <a href="../ai/ai-consulting.html" class="bg-primary hover:bg-blue-600 text-white font-medium py-3 px-6 !rounded-button whitespace-nowrap transition duration-300">
-    30초 자가 진단 하기
+    30초 빚탕감 진단 하기
 </a>
 </div>
 </div>
@@ -257,13 +493,12 @@
 <div class="sticky-sidebar">
 <!-- 상담 신청 폼 -->
 <div class="bg-white rounded-lg shadow-sm p-6 mb-8 side-form">
-<h3 class="text-xl font-bold text-gray-800 mb-4">연체·독촉이 두렵다면<br>가족 모르게 진행 가능한<br>개인회생·파산 무료 상담</h3>
+<h3 class="text-xl font-bold text-gray-800 mb-4">채무 문제로 힘들다면?<br>가족 모르게 진행 가능한<br>개인회생·파산 무료 상담</h3>
 <p class="text-gray-600 mb-6">현재 채무 상황을 간단히 남겨주시면<br>조건에 맞는 정부 지원 채무조정 제도와<br>개인회생 가능 여부를 1:1로 안내해드립니다.</p>
 <form id="form_e12" method="POST"
 action=""
 target="hidden_iframe12" onsubmit="dll1(); submitted=true;">
-<input type="hidden" entry.637408694
- value="오른쪽 사이드 바">
+<input type="hidden" name="entry.637408694" value="오른쪽 사이드 바">
 <div class="mb-4">
 <label class="block text-gray-700 text-sm font-medium mb-2" for="name1">이름</label>
 <input type="text" name="entry.1584470138" id="name1" class="w-full px-4 py-2 border border-gray-200 rounded focus:border-primary" placeholder="성함 입력" maxlength="4">
@@ -288,7 +523,7 @@ class="w-full px-4 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-p
 <label class="block text-gray-700 text-sm font-medium mb-2" for="message">문의 내용</label>
 <textarea name="entry.1470467061" id="message" rows="4" class="w-full px-4 py-2 border border-gray-200 rounded focus:border-primary" placeholder="예) 총 채무, 연체 여부, 가족 모르게 진행 가능 여부가 궁금합니다."></textarea>
 </div>
-<input type="submit" id="send_message1" class="w-full bg-primary text-white py-3 !rounded-button font-medium whitespace-nowrap hover:bg-blue-600 transition-colors" value="상담 신청하기">
+<input type="submit" id="send_message1" class="w-full bg-primary text-white py-3 !rounded-button font-medium whitespace-nowrap hover:bg-blue-600 transition-colors" value="상담 신청하기" disabled>
 
 <div class="mb-8 flex items-center space-x-2" style="margin-top:13px;">
     <input type="checkbox" name="agree11" id="agree111" value="개인정보보호정책 동의" class="w-5 h-5 text-primary border-gray-300 rounded" checked>
