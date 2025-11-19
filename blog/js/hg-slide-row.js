@@ -1,112 +1,174 @@
+// ./js/hg-slide.js
 (function () {
-  /* ========================
-   *  KPI 링 + 숫자 카운팅
-   * ======================== */
-  function initNb3Kpi(root) {
-    if (!root) return;
+  // nb3 섹션 HTML 템플릿 (기존 코드 그대로, <script> 부분만 제거)
+  const NB3_TEMPLATE = `
+<!-- ✅ 섹션 id를 nb3로 변경 · 디자인 유지 · nb1/nb2와 동일한 JS 패턴 적용 -->
+<section id="nb3">
+  <style>
+    #nb3{background:#f6f8fb;font-family:'Noto Sans KR',sans-serif;padding:5rem 0;}
+    #nb3 *{box-sizing:border-box}
+    #nb3 .nb3-container{max-width:1300px;margin:0 auto;padding:0 1.5rem;}
+    #nb3 .nb3-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem}
+    #nb3 .nb3-title{font-size:2.25rem;line-height:2.5rem;font-weight:bold;color:#1f2937;}
+    @media(max-width:768px){#nb3 .nb3-title{font-size:1.25rem;}}
+    @media(min-width:768px){#nb3 .nb3-title{font-size:2rem;line-height:1.4}}
+    #nb3 .nb3-nav-group{display:flex;gap:.5rem}
+    #nb3 .nb3-btn{width:40px;height:40px;border:none;border-radius:9999px;background:#0f172a;color:#fff;cursor:pointer}
+    #nb3 .nb3-slider-container{display:flex;overflow:hidden;padding-bottom:1.5rem;}
+    #nb3 .nb3-slider-wrapper{display:flex;gap:1.5rem;transition:transform .1s.ease;will-change:transform;}
+    #nb3 .nb3-product-slide{
+      display:block;
+      min-width:350px;
+      background:#fff;
+      border-radius:.75rem;
+      box-shadow:0 4px 6px rgba(0,0,0,.1),0 2px 4px rgba(0,0,0,.06);
+      overflow:hidden;
+      text-decoration:none;
+      color:inherit;
+      transition:transform .35s ease, box-shadow .35s ease;
+      will-change:transform;
+    }
+    @media(max-width:768px){#nb3 .nb3-product-slide{min-width:320px}}
+    #nb3 .case-media{position:relative;width:100%;overflow:hidden;background:#eef2f7;height:190px}
+    @media(max-width:640px){#nb3 .case-media{height:160px}}
+    #nb3 .case-img{width:100%;height:100%;object-fit:cover;object-position:center;}
+    #nb3 .media-pin{position:absolute;top:12px;left:12px;background:rgba(255,255,255,.95);backdrop-filter:saturate(1.2) blur(6px);border:1px solid #e2e8f0;border-radius:999px;padding:.35rem .6rem;font-size:12px;font-weight:800;color:#334155}
+    #nb3 .case-card{display:flex;flex-direction:column;gap:14px;padding:16px}
+    #nb3 .case-top{display:flex;align-items:center;justify-content:space-between}
+    #nb3 .case-pin{font-weight:800;font-size:12px;color:#475569;background:#fff;border:1px solid #e2e8f0;border-radius:999px;padding:4px 10px}
+    #nb3 .kpi-band{display:grid;grid-template-columns:1fr auto;gap:14px;padding:12px;background:#f9fafb;border:1px solid #eef2f7;border-radius:12px}
+    #nb3 .kpi-stack{display:flex;flex-direction:column;gap:10px}
+    #nb3 .kpi-box{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:4px}
+    #nb3 .kpi-label{font-size:12px;color:#64748b;font-weight:800}
+    #nb3 .kpi-value{font-weight:900;color:#0f172a;font-size:clamp(13px,2.4vw,15px)}
+    #nb3 .rate-ring{--p:0;width:124px;height:124px;border-radius:9999px;background:conic-gradient(#16a34a calc(var(--p)*1%), #e5e7eb 0);border:8px solid #fff;display:grid;place-items:center}
+    #nb3 .ring-inner{width:94px;height:94px;border-radius:9999px;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center}
+    #nb3 .ring-label{font-size:11px;color:#64748b;margin-bottom:4px;font-weight:700}
+    #nb3 .ring-val{font-weight:900;font-size:22px;color:#065f46}
+    #nb3 .badges{display:flex;flex-wrap:wrap;gap:8px}
+    #nb3 .badge{background:#eef2ff;border:1px solid #e0e7ff;color:#3730a3;padding:.42rem .66rem;border-radius:999px;font-size:12px;font-weight:800}
+    #nb3 .case-title{margin:6px 0 4px;font-weight:900;color:#0f172a;font-size:1.125rem;line-height:1.4}
+    #nb3 .case-desc{margin:0;color:#334155;line-height:1.6;font-size:14px}
+    #nb3 .progress{display:none;width:100%;height:12px;border-radius:9999px;background:#e2e8f0;overflow:hidden;margin-top:6px}
+    #nb3 .progress>span{display:block;height:100%;background:linear-gradient(90deg,#22c55e,#16a34a)}
+  </style>
 
+  <div class="nb3-container">
+    <div class="nb3-head">
+      <h2 class="nb3-title">실제 후기 · 탕감 결과</h2>
+      <div class="nb3-nav-group">
+        <button id="nb3Prev" class="nb3-btn"><i class="fas fa-chevron-left"></i></button>
+        <button id="nb3Next" class="nb3-btn"><i class="fas fa-chevron-right"></i></button>
+      </div>
+    </div>
+
+    <div id="nb3Slider" class="nb3-slider-container">
+      <div class="nb3-slider-wrapper">
+
+        <!-- 카드 1 -->
+        <a class="nb3-product-slide" href="../blog/story1.html">
+          <div class="case-media">
+            <img class="case-img" src="../blog/img/story-3.jpg" alt="주거담보 사례 썸네일">
+            <span class="media-pin">01 / 03</span>
+          </div>
+          <article class="case-card">
+            <div class="case-top"><span class="case-pin">직장인 / 39세 / 남자 / 월소득 200만원 </span></div>
+            <div class="kpi-band">
+              <div class="kpi-stack">
+                <div class="kpi-box"><span class="kpi-label">총 채무액</span><span class="kpi-value">₩86,710,000</span></div>
+                <div class="kpi-box"><span class="kpi-label">월 상환액</span><span class="kpi-value">340 -> 61만원</span></div>
+              </div>
+              <div class="rate-ring" data-rate="75">
+                <div class="ring-inner">
+                  <div class="ring-label">탕감율</div>
+                  <div class="ring-val">75%</div>
+                </div>
+              </div>
+            </div>
+            <div class="badges"><span class="badge">폐업</span><span class="badge">수술비</span><span class="badge">직장인</span></div>
+            <h3 class="case-title">“8,671만원 빚을 안고,
+배우자 몰래 힘겹게 버티고 있었습니다.”</h3>
+            <p class="case-desc">무엇보다 “배우자에게만은 절대 들키고 싶지 않다”는 마음이 가장 컸습니다.</p>
+          </article>
+        </a>
+
+        <!-- 카드 2 -->
+        <a class="nb3-product-slide" href="../blog/story2.html">
+          <div class="case-media">
+            <img class="case-img" src="../blog/img/story2-8.jpg" alt="투자손실 사례 썸네일">
+            <span class="media-pin">02 / 03</span>
+          </div>
+          <article class="case-card">
+            <div class="case-top"><span class="case-pin">직장인 / 49세 / 여자 / 월소득 210만원 </span></div>
+            <div class="kpi-band">
+              <div class="kpi-stack">
+                <div class="kpi-box"><span class="kpi-label">총 채무액</span><span class="kpi-value">₩72,548,111</span></div>
+                <div class="kpi-box"><span class="kpi-label">월 상환액</span><span class="kpi-value">200 -> 15만원</span></div>
+              </div>
+              <div class="rate-ring" data-rate="92">
+                <div class="ring-inner">
+                  <div class="ring-label">탕감율</div>
+                  <div class="ring-val">92%</div>
+                </div>
+              </div>
+            </div>
+            <div class="badges"><span class="badge">실직</span><span class="badge">수술비</span><span class="badge">학원비</span></div>
+            <h3 class="case-title">“딸아이 학원비조차 못 내는 엄마가 될 줄은 정말 몰랐습니다.”</h3>
+            <p class="case-desc">하지만 어느 날, 학원비를 더는 낼 수 없다는 말을 딸아이에게 꺼내야 하는 상황이 찾아왔고, 그때 제 마음도 함께 무너져 내렸습니다.</p>
+          </article>
+        </a>
+
+        <!-- 카드 3 -->
+        <a class="nb3-product-slide" href="../blog/story3.html">
+          <div class="case-media">
+            <img class="case-img" src="../blog/img/story3-1.jpg" alt="자영업 사례 썸네일">
+            <span class="media-pin">03 / 03</span>
+          </div>
+          <article class="case-card">
+            <div class="case-top"><span class="case-pin">직장인 / 32세 / 여자 / 월소득 180만원 </span></div>
+            <div class="kpi-band">
+              <div class="kpi-stack">
+                <div class="kpi-box"><span class="kpi-label">총 채무액</span><span class="kpi-value">₩70,042,243</span></div>
+                <div class="kpi-box"><span class="kpi-label">월 상환액</span><span class="kpi-value">200 -> 15만원</span></div>
+              </div>
+              <div class="rate-ring" data-rate="92">
+                <div class="ring-inner">
+                  <div class="ring-label">탕감율</div>
+                  <div class="ring-val">92%</div>
+                </div>
+              </div>
+            </div>
+            <div class="badges"><span class="badge">양육비 미수령</span><span class="badge">생활고</span><span class="badge">교육비</span></div>
+            <h3 class="case-title">“낮은 소득과 양육비 미수, 생활비가 빚의 시작이었.”</h3>
+            <p class="case-desc">부족한 월급을 메우기 위해 시작한 대출이 어느 순간, 감당할 수 없는 수준의 빚이 되어버렸다는 걸 인정해야 했어요.</p>
+          </article>
+        </a>
+
+      </div>
+    </div>
+  </div>
+</section>
+`;
+
+  // 🔹 탕감율 링 애니메이션 초기화
+  function initRateRings(root) {
     const EASE = (t) => 1 - Math.pow(1 - t, 3);
-    const DURATION = 900; // 게이지 및 숫자 카운트 동일 시간
-
-    // 유틸: 숫자에 콤마
-    const fmtComma = (n) =>
-      n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
-    // 유틸: 통화 문자열을 prefix/number/suffix로 분해 (예: "₩150,000,000")
-    function parseCurrencyParts(text) {
-      const mAll = [...text.matchAll(/(\d[\d,]*)/g)];
-      if (!mAll.length) return null;
-      const m = mAll[mAll.length - 1]; // 마지막 숫자 그룹 기준
-      const start = m.index;
-      const len = m[0].length;
-      const num = parseInt(m[0].replace(/,/g, ""), 10) || 0;
-      return {
-        prefix: text.slice(0, start),
-        suffix: text.slice(start + len),
-        number: num
-      };
-    }
-
-    // 유틸: 마지막 숫자 그룹만 카운트 (예: "1년간 2회" -> 2만 카운트)
-    function parseLastNumberParts(text) {
-      const mAll = [...text.matchAll(/(\d[\d,]*)/g)];
-      if (!mAll.length) return null;
-      const m = mAll[mAll.length - 1];
-      const start = m.index;
-      const len = m[0].length;
-      const num = parseInt(m[0].replace(/,/g, ""), 10) || 0;
-      return {
-        head: text.slice(0, start),
-        tail: text.slice(start + len),
-        number: num
-      };
-    }
-
-    // 특정 슬라이드(card)에서 라벨 텍스트로 KPI value 엘리먼트 찾기
-    function findKpiValueEl(cardEl, labelText) {
-      const boxes = cardEl.querySelectorAll(".kpi-box");
-      for (const box of boxes) {
-        const lbl = box.querySelector(".kpi-label");
-        const val = box.querySelector(".kpi-value");
-        if (lbl && val && lbl.textContent.trim() === labelText) return val;
-      }
-      return null;
-    }
-
-    // 카운팅 적용
-    function driveCountingForCard(cardEl, progress) {
-      // 승인금액
-      const amtEl = findKpiValueEl(cardEl, "승인금액");
-      if (amtEl) {
-        if (!amtEl.dataset.orig) amtEl.dataset.orig = amtEl.textContent.trim();
-        if (!amtEl._parts)
-          amtEl._parts = parseCurrencyParts(amtEl.dataset.orig);
-        const p = amtEl._parts;
-        if (p) {
-          const cur = Math.round(p.number * progress);
-          amtEl.textContent = p.prefix + fmtComma(cur) + p.suffix;
-        }
-      }
-      // 총 정책자금 횟수
-      const cntEl = findKpiValueEl(cardEl, "총 정책자금 횟수");
-      if (cntEl) {
-        if (!cntEl.dataset.orig) cntEl.dataset.orig = cntEl.textContent.trim();
-        if (!cntEl._parts)
-          cntEl._parts = parseLastNumberParts(cntEl.dataset.orig);
-        const p2 = cntEl._parts;
-        if (p2) {
-          const cur2 = Math.round(p2.number * progress);
-          cntEl.textContent = p2.head + cur2.toString() + p2.tail;
-        }
-      }
-    }
-
-    function resetCountingForCard(cardEl) {
-      const amtEl = findKpiValueEl(cardEl, "승인금액");
-      if (amtEl && amtEl.dataset.orig) amtEl.textContent = amtEl.dataset.orig;
-      const cntEl = findKpiValueEl(cardEl, "총 정책자금 횟수");
-      if (cntEl && cntEl.dataset.orig) cntEl.textContent = cntEl.dataset.orig;
-    }
+    const DURATION = 900;
 
     function animateRing(el) {
-      const target = Math.max(
-        0,
-        Math.min(100, Number(el.getAttribute("data-rate") || 0))
-      );
+      const target = Math.max(0, Math.min(100, Number(el.getAttribute('data-rate') || 0)));
+      const valEl = el.querySelector('.ring-val');
       let start = null;
-      el.style.setProperty("--p", 0);
-
-      const card = el.closest(".case-card");
+      el.style.setProperty('--p', 0);
+      if (valEl) valEl.textContent = '0%';
 
       function step(ts) {
         if (!start) start = ts;
         const t = Math.min(1, (ts - start) / DURATION);
         const eased = EASE(t);
         const cur = Math.round(target * eased);
-        el.style.setProperty("--p", cur);
-
-        if (card) driveCountingForCard(card, eased);
-
+        el.style.setProperty('--p', cur);
+        if (valEl) valEl.textContent = cur + '%';
         if (t < 1) el._raf = requestAnimationFrame(step);
         else el._raf = null;
       }
@@ -118,23 +180,20 @@
     function resetRing(el) {
       if (el._raf) cancelAnimationFrame(el._raf);
       el._raf = null;
-      el.style.setProperty("--p", 0);
-      const card = el.closest(".case-card");
-      if (card) resetCountingForCard(card);
+      el.style.setProperty('--p', 0);
+      const valEl = el.querySelector('.ring-val');
+      if (valEl) valEl.textContent = '0%';
     }
 
-    const rings = Array.from(root.querySelectorAll(".rate-ring[data-rate]"));
+    const rings = Array.from(root.querySelectorAll('.rate-ring[data-rate]'));
     if (!rings.length) return;
 
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           const el = entry.target;
-          if (entry.isIntersecting) {
-            animateRing(el);
-          } else {
-            resetRing(el);
-          }
+          if (entry.isIntersecting) animateRing(el);
+          else resetRing(el);
         });
       },
       { threshold: 0.35 }
@@ -143,16 +202,12 @@
     rings.forEach((el) => io.observe(el));
   }
 
-  /* ========================
-   *  슬라이더 제어
-   * ======================== */
+  // 🔹 nb3 슬라이더 초기화 (기존 nb1/nb2 패턴 그대로)
   function initNb3Slider(root) {
-    if (!root) return;
-
-    const slider = root.querySelector("#nb3Slider");
-    const track = slider ? slider.querySelector(".nb3-slider-wrapper") : null;
-    const prevBtn = root.querySelector("#nb3Prev");
-    const nextBtn = root.querySelector("#nb3Next");
+    const slider = root.querySelector('#nb3Slider');
+    const track = slider ? slider.querySelector('.nb3-slider-wrapper') : null;
+    const prevBtn = root.querySelector('#nb3Prev');
+    const nextBtn = root.querySelector('#nb3Next');
 
     if (!slider || !track) return;
 
@@ -162,82 +217,67 @@
     let gap = 0;
 
     function updateDimensions() {
-      const cards = slider.querySelectorAll(".nb3-product-slide");
+      const cards = slider.querySelectorAll('.nb3-product-slide');
       const containerWidth = slider.clientWidth;
       if (cards.length > 0) {
         const first = cards[0];
         cardWidth = first.getBoundingClientRect().width;
         gap = parseFloat(getComputedStyle(track).gap) || 24; // 1.5rem
-        const visible = Math.max(
-          1,
-          Math.floor((containerWidth - 0 + gap) / (cardWidth + gap))
-        );
+        const visible = Math.max(1, Math.floor((containerWidth + gap) / (cardWidth + gap)));
         maxIndex = Math.max(0, cards.length - visible);
       }
     }
 
     function setTransform(index, animate = true) {
       const tx = -index * (cardWidth + gap);
+      const clampedIndex = Math.max(0, Math.min(index, maxIndex));
       if (animate) {
-        slider.classList.add("animating");
-        track.style.transition =
-          "transform .6s cubic-bezier(0.25,0.46,0.45,0.94)";
+        slider.classList.add('animating');
+        track.style.transition = 'transform .6s cubic-bezier(0.25,0.46,0.45,0.94)';
         track.style.transform = `translateX(${tx}px)`;
         setTimeout(() => {
-          slider.classList.remove("animating");
-          track.style.transition = "transform .1s ease";
+          slider.classList.remove('animating');
+          track.style.transition = 'transform .1s ease';
         }, 600);
       } else {
-        track.style.transition = "transform .1s ease";
+        track.style.transition = 'transform .1s ease';
         track.style.transform = `translateX(${tx}px)`;
       }
-      currentIndex = Math.max(0, Math.min(index, maxIndex));
+      currentIndex = clampedIndex;
     }
 
     function moveTo(index) {
       setTransform(Math.max(0, Math.min(index, maxIndex)), true);
     }
 
-    /* ===== 버튼 ===== */
-    let auto = null;
-    let resume = null;
-
-    function stopAuto() {
-      if (auto) {
-        clearInterval(auto);
-        auto = null;
-      }
-    }
+    // 버튼
     function pauseAuto() {
       stopAuto();
-      if (resume) {
-        clearTimeout(resume);
-        resume = null;
+      if (resumeTimer) {
+        clearTimeout(resumeTimer);
+        resumeTimer = null;
       }
     }
-    function startAuto() {
-      stopAuto();
-      auto = setInterval(step, INTERVAL);
-    }
     function resumeAutoLater(delay = 6200) {
-      if (resume) clearTimeout(resume);
-      resume = setTimeout(() => startAuto(), delay);
+      if (resumeTimer) clearTimeout(resumeTimer);
+      resumeTimer = setTimeout(() => startAuto(), delay);
     }
 
     if (prevBtn)
-      prevBtn.addEventListener("click", () => {
+      prevBtn.addEventListener('click', () => {
         pauseAuto();
         moveTo(currentIndex - 1);
         resumeAutoLater();
       });
+
     if (nextBtn)
-      nextBtn.addEventListener("click", () => {
+      nextBtn.addEventListener('click', () => {
         pauseAuto();
         moveTo(currentIndex + 1);
         resumeAutoLater();
       });
 
-    /* ===== 드래그/스와이프 ===== */
+    // 드래그/스와이프
     let isDragging = false,
       started = false;
     let startX = 0,
@@ -253,14 +293,12 @@
       MIN_V = 0.8;
 
     function getTX() {
-      const m = track.style.transform.match(
-        /translateX\((-?\d+(?:\.\d+)?)px\)/
-      );
+      const m = track.style.transform.match(/translateX\((-?\d+(?:\.\d+)?)px\)/);
       return m ? parseFloat(m[1]) : 0;
     }
 
     function onStart(e) {
-      if (e.type === "mousedown" && e.button !== 0) return;
+      if (e.type === 'mousedown' && e.button !== 0) return;
       isDragging = true;
       started = false;
       startX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -269,7 +307,7 @@
       lastX = startX;
       lastT = performance.now();
       v = 0;
-      slider.classList.add("dragging");
+      slider.classList.add('dragging');
       if (raf) {
         cancelAnimationFrame(raf);
         raf = null;
@@ -307,8 +345,8 @@
     }
 
     function snap() {
-      const stepPX = cardWidth + gap;
-      const idx = Math.round(-curTX / stepPX);
+      const step = cardWidth + gap;
+      const idx = Math.round(-curTX / step);
       const clamp = Math.max(0, Math.min(idx, maxIndex));
       currentIndex = clamp;
       setTransform(clamp, true);
@@ -339,7 +377,7 @@
     function onEnd(e) {
       if (!isDragging) return;
       isDragging = false;
-      slider.classList.remove("dragging");
+      slider.classList.remove('dragging');
       if (started) {
         if (Math.abs(v) > MIN_V) momentum();
         else snap();
@@ -350,18 +388,17 @@
       e.preventDefault();
     }
 
-    slider.addEventListener("mousedown", onStart, { passive: false });
-    document.addEventListener("mousemove", onMove, { passive: false });
-    document.addEventListener("mouseup", onEnd, { passive: false });
+    slider.addEventListener('mousedown', onStart, { passive: false });
+    document.addEventListener('mousemove', onMove, { passive: false });
+    document.addEventListener('mouseup', onEnd, { passive: false });
 
-    slider.addEventListener("touchstart", onStart, { passive: false });
-    slider.addEventListener("touchmove", onMove, { passive: false });
-    slider.addEventListener("touchend", onEnd, { passive: false });
-    slider.addEventListener("touchcancel", onEnd, { passive: false });
+    slider.addEventListener('touchstart', onStart, { passive: false });
+    slider.addEventListener('touchmove', onMove, { passive: false });
+    slider.addEventListener('touchend', onEnd, { passive: false });
+    slider.addEventListener('touchcancel', onEnd, { passive: false });
 
-    // 드래그 후 클릭 방지
     slider.addEventListener(
-      "click",
+      'click',
       (e) => {
         if (started) {
           e.preventDefault();
@@ -372,17 +409,29 @@
       true
     );
 
-    slider.addEventListener("dragstart", (e) => e.preventDefault());
+    slider.addEventListener('dragstart', (e) => e.preventDefault());
 
-    /* ===== 자동 롤링 ===== */
+    // 자동 롤링
     const INTERVAL = 4200;
+    let auto = null;
+    let resumeTimer = null;
 
     function step() {
       const next = currentIndex >= maxIndex ? 0 : currentIndex + 1;
       moveTo(next);
     }
+    function startAuto() {
+      stopAuto();
+      auto = setInterval(step, INTERVAL);
+    }
+    function stopAuto() {
+      if (auto) {
+        clearInterval(auto);
+        auto = null;
+      }
+    }
 
-    /* ===== 초기화 & 리사이즈 ===== */
+    // 리사이즈 & visibility
     function init() {
       updateDimensions();
       setTransform(0, false);
@@ -390,7 +439,7 @@
     }
 
     let rTimer = null;
-    window.addEventListener("resize", () => {
+    window.addEventListener('resize', () => {
       pauseAuto();
       clearTimeout(rTimer);
       rTimer = setTimeout(() => {
@@ -400,7 +449,7 @@
       }, 200);
     });
 
-    document.addEventListener("visibilitychange", () => {
+    document.addEventListener('visibilitychange', () => {
       if (document.hidden) pauseAuto();
       else resumeAutoLater(1800);
     });
@@ -408,311 +457,17 @@
     init();
   }
 
-  /* ========================
-   *  섹션 생성 & 마운트
-   * ======================== */
-  function mountHgSlide() {
-    const mount = document.getElementById("hg-slide");
-    if (!mount || mount.dataset.hgSlideInit === "1") return;
+  // 🔹 DOMContentLoaded 시 #hg-slide 위치에 nb3 섹션 삽입 + 초기화
+  document.addEventListener('DOMContentLoaded', function () {
+    const mount = document.getElementById('hg-slide');
+    if (!mount) return;
 
-    mount.dataset.hgSlideInit = "1";
+    mount.innerHTML = NB3_TEMPLATE;
 
-    // 기존 섹션 nb3 전체 마크업 삽입 (스크립트만 제거)
-    mount.innerHTML = `
-<section id="nb3">
-  <style>
-    #nb3{background:#f6f8fb;font-family:'Noto Sans KR',sans-serif;padding:5rem 0;}
-    #nb3 *{box-sizing:border-box}
-    #nb3 .nb3-container{max-width:1300px;margin:0 auto;padding:0 1.5rem;}
-    #nb3 .nb3-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem}
-    #nb3 .nb3-title{font-size:2.25rem;line-height:2.5rem;font-weight:bold;color:#1f2937;}
-    @media(min-width:768px){#nb3 .nb3-title{font-size:2rem;line-height:1.4}}
-    #nb3 .nb3-nav-group{display:flex;gap:.5rem}
-    #nb3 .nb3-btn{width:40px;height:40px;border:none;border-radius:9999px;background:#0f172a;color:#fff;cursor:pointer}
-    #nb3 .nb3-slider-container{display:flex;overflow:hidden;padding-bottom:1.5rem;}
-    #nb3 .nb3-slider-wrapper{display:flex;gap:1.5rem;transition:transform .1s ease;will-change:transform;}
-    #nb3 .nb3-product-slide{
-      display:block;
-      width:340px;
-      background:#fff;
-      border-radius:.75rem;
-      box-shadow:0 4px 6px rgba(0,0,0,.1),0 2px 4px rgba(0,0,0,.06);
-      overflow:hidden;
-      text-decoration:none;
-      color:inherit;
-      transition:transform .35s ease, box-shadow .35s ease;
-      will-change:transform;
-    }
-    @media(max-width:768px){#nb3 .nb3-product-slide{width:350px}}
-    #nb3 .case-media{position:relative;width:100%;overflow:hidden;background:#eef2f7;height:190px}
-    @media(max-width:640px){#nb3 .case-media{height:160px}}
-    #nb3 .case-img{width:100%;height:100%;object-fit:cover;object-position:center;}
-    #nb3 .media-pin{position:absolute;top:12px;left:12px;background:rgba(255,255,255,.95);backdrop-filter:saturate(1.2) blur(6px);border:1px solid #e2e8f0;border-radius:999px;padding:.35rem .6rem;font-size:12px;font-weight:800;color:#334155}
-    #nb3 .case-card{display:flex;flex-direction:column;gap:14px;padding:16px}
-    #nb3 .case-top{display:flex;align-items:center;justify-content:space-between}
-    #nb3 .case-pin{font-weight:800;font-size:12px;color:#475569;background:#fff;border:1px solid #e2e8f0;border-radius:999px;padding:4px 10px}
-    #nb3 .kpi-band{display:grid;grid-template-columns:1fr auto;gap:14px;padding:12px;background:#f9fafb;border:1px solid #eef2f7;border-radius:12px;align-items:center;}
-    #nb3 .kpi-stack{display:flex;flex-direction:column;gap:10px}
-    #nb3 .kpi-box{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:4px}
-    #nb3 .kpi-label{font-size:12px;color:#64748b;font-weight:800}
-    #nb3 .kpi-value{font-weight:900;color:#0f172a;font-size:clamp(13px,2.4vw,18px)}
-    #nb3 .rate-ring{--p:0;width:124px;height:124px;border-radius:9999px;background:conic-gradient(#16a34a calc(var(--p)*1%), #e5e7eb 0);border:8px solid #fff;display:grid;place-items:center}
-    #nb3 .ring-inner{width:94px;height:94px;border-radius:9999px;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center}
-    #nb3 .ring-label{font-size:11px;color:#64748b;margin-bottom:4px;font-weight:700}
-    #nb3 .ring-val{font-weight:900;font-size:22px;color:#065f46}
-    #nb3 .badges{display:flex;flex-wrap:wrap;gap:8px}
-    #nb3 .badge{background:#eef2ff;border:1px solid #e0e7ff;color:#3730a3;padding:.42rem .66rem;border-radius:999px;font-size:12px;font-weight:800}
-    #nb3 .case-title{margin:6px 0 4px;font-weight:900;color:#0f172a;font-size:1.125rem;line-height:1.4}
-    #nb3 .case-desc{margin:0;color:#334155;line-height:1.6;font-size:14px}
-    #nb3 .progress{display:none;width:100%;height:12px;border-radius:9999px;background:#e2e8f0;overflow:hidden;margin-top:6px}
-    #nb3 .progress>span{display:block;height:100%;background:linear-gradient(90deg,#22c55e,#16a34a)}
-    @media(max-width:420px){#nb3 .nb3-product-slide{width:306px}}
-  </style>
-
-  <div class="nb3-container">
-    <div class="nb3-head">
-      <h2 class="nb3-title">실제 후기</h2>
-      <div class="nb3-nav-group">
-        <button id="nb3Prev" class="nb3-btn"><i class="fas fa-chevron-left"></i></button>
-        <button id="nb3Next" class="nb3-btn"><i class="fas fa-chevron-right"></i></button>
-      </div>
-    </div>
-
-    <div id="nb3Slider" class="nb3-slider-container">
-      <div class="nb3-slider-wrapper">
-
-        <!-- 카드 1 -->
-        <a href="./story1.html" class="nb3-product-slide">
-          <div class="case-media">
-            <img class="case-img" src="./img/h9.jpg" alt="소상공인 정책자금 후기 썸네일 - 음식점 운영자">
-            <span class="media-pin">01 / 09</span>
-          </div>
-          <article class="case-card">
-            <div class="case-top"><span class="case-pin">정보통신업(IT) / 사업 2년차 / 김** 님</span></div>
-            <div class="kpi-band">
-              <div class="kpi-stack">
-                <div class="kpi-box"><span class="kpi-label">승인금액</span><span class="kpi-value">₩150,000,000</span></div>
-                <div class="kpi-box"><span class="kpi-label">총 정책자금 횟수</span><span class="kpi-value">1년간 2회</span></div>
-              </div>
-              <div class="rate-ring" data-rate="97">
-                <div class="ring-inner">
-                  <div class="ring-label">금리</div>
-                  <div class="ring-val">3%</div>
-                </div>
-              </div>
-            </div>
-            <div class="badges"><span class="badge">운전자금</span><span class="badge">개발비용 확보</span></div>
-            <h3 class="case-title">1억 5천을 받을 줄 몰랐습니다.</h3>
-            <p class="case-desc">프로그램 개발 진행이 지연되면서 자금 부족에 시달리고 있었어요... 1금융 대출은 엄두도 못내는 초기 스타트업이라 막막하기만 했는데 스타트업은 정책자금이라는 걸 이번 기회에 알았습니다.</p>
-          </article>
-        </a>
-
-        <!-- 카드 2 -->
-        <a class="nb3-product-slide">
-          <div class="case-media">
-            <img class="case-img" src="./img/h3.jpg" alt="소상공인 정책자금 후기 썸네일 - 카페 운영자">
-            <span class="media-pin">02 / 09</span>
-          </div>
-          <article class="case-card">
-            <div class="case-top"><span class="case-pin">카페 / 사업 5년차 / 한** 님</span></div>
-            <div class="kpi-band">
-              <div class="kpi-stack">
-                <div class="kpi-box">
-                  <span class="kpi-label">승인금액</span>
-                  <span class="kpi-value">₩78,000,000</span>
-                </div>
-                <div class="kpi-box">
-                  <span class="kpi-label">총 정책자금 횟수</span>
-                  <span class="kpi-value">1회</span>
-                </div>
-              </div>
-              <div class="rate-ring" data-rate="97">
-                <div class="ring-inner">
-                  <div class="ring-label">금리</div>
-                  <div class="ring-val">2.7%</div>
-                </div>
-              </div>
-            </div>
-            <div class="badges">
-              <span class="badge">장비·인테리어 개선</span>
-            </div>
-            <h3 class="case-title">덕분에 매출이 많이 뛰었어요!</h3>
-            <p class="case-desc">
-              카페 운영으로 인테리어 확장이 필요해 알아보다 정책자금으로
-              에스프레소 머신 유지보수와 좌석 리뉴얼에 투입해 회전율이 눈에 띄게 좋아졌습니다.
-            </p>
-          </article>
-        </a>
-
-        <!-- 카드 3 -->
-        <a class="nb3-product-slide">
-          <div class="case-media">
-            <img class="case-img" src="./img/h11.jpg" alt="소상공인 정책자금 후기 썸네일 - 음식점 운영자">
-            <span class="media-pin">03 / 09</span>
-          </div>
-          <article class="case-card">
-            <div class="case-top"><span class="case-pin">식당 / 사업 7년차 / 정** 님</span></div>
-            <div class="kpi-band">
-              <div class="kpi-stack">
-                <div class="kpi-box">
-                  <span class="kpi-label">승인금액</span>
-                  <span class="kpi-value">₩40,000,000</span>
-                </div>
-                <div class="kpi-box">
-                  <span class="kpi-label">총 정책자금 횟수</span>
-                  <span class="kpi-value">1회</span>
-                </div>
-              </div>
-              <div class="rate-ring" data-rate="97">
-                <div class="ring-inner">
-                  <div class="ring-label">금리</div>
-                  <div class="ring-val">3.1%</div>
-                </div>
-              </div>
-            </div>
-            <div class="badges">
-              <span class="badge">운전자금</span>
-            </div>
-            <h3 class="case-title">운영 자금 부족 말끔히 해결했네요.</h3>
-            <p class="case-desc">
-              물가가 너무 오르면서 고정비와 인건비 압박... 매출까지 떨어지는 상황에서
-              식당 운영자금 부족으로 대출 부결돼서 절박한 마음으로 신청했습니다.
-              아무것도 몰랐는데도 심사요건에 맞춰주셔서 승인받고 자금 확보했어요.
-            </p>
-          </article>
-        </a>
-
-        <!-- 카드 4 -->
-        <a class="nb3-product-slide">
-          <div class="case-media">
-            <img class="case-img" src="./img/h7.jpg" alt="소상공인 정책자금 후기 썸네일 - 음식점 운영자">
-            <span class="media-pin">04 / 09</span>
-          </div>
-          <article class="case-card">
-            <div class="case-top"><span class="case-pin">정보통신업(IT) / 사업 8년차 / 이** 님</span></div>
-            <div class="kpi-band">
-              <div class="kpi-stack">
-                <div class="kpi-box">
-                  <span class="kpi-label">승인금액</span>
-                  <span class="kpi-value">₩210,000,000</span>
-                </div>
-                <div class="kpi-box">
-                  <span class="kpi-label">총 정책자금 횟수</span>
-                  <span class="kpi-value">3회</span>
-                </div>
-              </div>
-              <div class="rate-ring" data-rate="97">
-                <div class="ring-inner">
-                  <div class="ring-label">금리</div>
-                  <div class="ring-val">2.3%</div>
-                </div>
-              </div>
-            </div>
-            <div class="badges">
-              <span class="badge">상품 기획 및 마케팅 비용</span>
-            </div>
-            <h3 class="case-title">사업 한계의 시점에서 한줄기 빛이 되었어요</h3>
-            <p class="case-desc">
-              매출의 한계와 마케팅 전략에 한계를 느끼던 중 정책자금 기반으로
-              신규 유입과 재방문율이 올라 사업 흐름이 다시 살아났습니다.
-            </p>
-          </article>
-        </a>
-
-        <!-- 카드 5 -->
-        <a class="nb3-product-slide">
-          <div class="case-media">
-            <img class="case-img" src="./img/h2.jpg" alt="소상공인 정책자금 후기 썸네일 - 음식점 운영자">
-            <span class="media-pin">05 / 09</span>
-          </div>
-          <article class="case-card">
-            <div class="case-top"><span class="case-pin">건설업 / 사업 10년차 / 정** 님</span></div>
-            <div class="kpi-band">
-              <div class="kpi-stack">
-                <div class="kpi-box">
-                  <span class="kpi-label">승인금액</span>
-                  <span class="kpi-value">₩400,000,000</span>
-                </div>
-                <div class="kpi-box">
-                  <span class="kpi-label">총 정책자금 횟수</span>
-                  <span class="kpi-value">2회</span>
-                </div>
-              </div>
-              <div class="rate-ring" data-rate="97">
-                <div class="ring-inner">
-                  <div class="ring-label">금리</div>
-                  <div class="ring-val">3.3%</div>
-                </div>
-              </div>
-            </div>
-            <div class="badges">
-              <span class="badge">운전자금</span>
-            </div>
-            <h3 class="case-title">자재·인건비 압박, 드디어 숨통이 트였습니다.</h3>
-            <p class="case-desc">
-              공사 선투입 자재대금과 장비임차·인건비가 겹치며 은행 대출이 잇달아 거절됐습니다.
-              절박하게 요청 부탁드렸고 심사에 잘 맞춰 주셔서 승인 받아 현장 운영이 안정됐습니다.
-            </p>
-          </article>
-        </a>
-
-        <!-- 카드 6 -->
-        <a class="nb3-product-slide">
-          <div class="case-media">
-            <img class="case-img" src="./img/h10.jpg" alt="소상공인 정책자금 후기 썸네일 - 음식점 운영자">
-            <span class="media-pin">06 / 09</span>
-          </div>
-          <article class="case-card">
-            <div class="case-top"><span class="case-pin">옷가게 / 사업 7년차 / 정** 님</span></div>
-            <div class="kpi-band">
-              <div class="kpi-stack">
-                <div class="kpi-box">
-                  <span class="kpi-label">승인금액</span>
-                  <span class="kpi-value">₩110,000,000</span>
-                </div>
-                <div class="kpi-box">
-                  <span class="kpi-label">총 정책자금 횟수</span>
-                  <span class="kpi-value">1회</span>
-                </div>
-              </div>
-              <div class="rate-ring" data-rate="97">
-                <div class="ring-inner">
-                  <div class="ring-label">금리</div>
-                  <div class="ring-val">2.6%</div>
-                </div>
-              </div>
-            </div>
-            <div class="badges">
-              <span class="badge">운전자금</span>
-            </div>
-            <h3 class="case-title">다 거절이었는데, 여기서 승인됐습니다.</h3>
-            <p class="case-desc">
-              정책자금 여러 곳에 신청했다가 모두 반려되서 기대없이 신청했는데 5천만원 승인되서 정말 놀랐어요!
-              계속 미뤘던 신상 사입·매장 리뉴얼·촬영 장비 마련해서 카테고리 확장했어요!
-            </p>
-          </article>
-        </a>
-
-      </div>
-    </div>
-  </div>
-</section>
-    `;
-
-    const root = mount.querySelector("#nb3");
+    const root = mount.querySelector('#nb3');
     if (!root) return;
 
-    initNb3Kpi(root);
+    initRateRings(root);
     initNb3Slider(root);
-  }
-
-  function onReady(fn) {
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", fn, { once: true });
-    } else {
-      fn();
-    }
-  }
-
-  onReady(mountHgSlide);
+  });
 })();
