@@ -18,7 +18,7 @@
     #nb3 .nb3-slider-wrapper{display:flex;gap:1.5rem;transition:transform .1s.ease;will-change:transform;}
     #nb3 .nb3-product-slide{
       display:block;
-      min-width:350px;
+      width:350px;
       background:#fff;
       border-radius:.75rem;
       box-shadow:0 4px 6px rgba(0,0,0,.1),0 2px 4px rgba(0,0,0,.06);
