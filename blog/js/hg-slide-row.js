@@ -144,7 +144,7 @@
               </div>
             </div>
             <div class="badges"><span class="badge">양육비 미수령</span><span class="badge">생활고</span><span class="badge">교육비</span></div>
-            <h3 class="case-title">“낮은 소득과 양육비 미수, 생활비가 빚의 시작이었.”</h3>
+            <h3 class="case-title">“낮은 소득과 양육비 미수, 생활비가 빚의 시작이었어요.”</h3>
             <p class="case-desc">부족한 월급을 메우기 위해 시작한 대출이 어느 순간, 감당할 수 없는 수준의 빚이 되어버렸다는 걸 인정해야 했어요.</p>
           </article>
         </a>
