@@ -4,7 +4,7 @@ footer.innerHTML = `
   <!-- 상단: 로고 + 네비 -->
   <div class="footer-top">
     <div class="footer-logo">
-      <img src="./img/thel.png" alt="">
+      <img src="../img/thel.png" alt="">
     </div>
    
   </div>
