@@ -228,7 +228,7 @@
       #legalDBHero .db-sub { font-size:.85rem; }
       #legalDBHero .left .bubble { display:none; }
       #legalDBHero .right h3 { font-size:1.35rem; margin-top:10px; margin-bottom:15px; }
-      #legalDBHero .right ul li { font-size:1.1rem; padding:10px 0; }
+      #legalDBHero .right ul li { font-size:0.8rem; padding:10px 0; }
       #legalDBHero .actions { flex-direction:column; gap:8px; }
       #legalDBHero .actions .btn-outline, #legalDBHero .actions .btn-fill { width:100%; max-width:200px; font-size:.95rem; }
       .border1{display:block;}
@@ -271,6 +271,15 @@
       font-weight:900; font-size:40px; line-height:1.2; letter-spacing:-.4px;
       color:#0f172a;
     }
+
+
+    @media screen and (max-width: 460px) {
+          #whoCanPartner .hero .headline{
+       font-size:30px; 
+    }
+      
+    }
+
     /* 하이라이트를 민트 톤으로 */
     #whoCanPartner .hero .headline .hl{
       display:inline-block; color:var(--mint);
